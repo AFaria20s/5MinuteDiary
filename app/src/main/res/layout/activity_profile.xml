@@ -152,7 +152,7 @@
 
                     </androidx.cardview.widget.CardView>
 
-                    <!-- This Month -->
+                    <!-- Streak -->
                     <androidx.cardview.widget.CardView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -170,7 +170,7 @@
                             android:gravity="center">
 
                             <TextView
-                                android:id="@+id/thisMonthText"
+                                android:id="@+id/streakText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0"
@@ -181,7 +181,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Este mês"
+                                android:text="Streak"
                                 android:textSize="13sp"
                                 android:textColor="#6B7280"
                                 android:layout_marginTop="4dp" />
@@ -220,7 +220,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Descobre padrões na tua escrita ao longo do tempo com estatísticas avançadas"
+                            android:text="Descobre padrões na tua escrita"
                             android:textSize="18sp"
                             android:textStyle="bold"
                             android:textColor="#1F2937"
@@ -229,7 +229,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Sequências, gráficos, padrões de escrita e muito mais"
+                            android:text="Análises detalhadas, gráficos e muito mais"
                             android:textSize="14sp"
                             android:textColor="#6B7280"
                             android:lineSpacingExtra="4dp"
@@ -257,7 +257,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Sequência de dias consecutivos"
+                                    android:text="Histórico detalhado de streak"
                                     android:textSize="13sp"
                                     android:textColor="#6B7280" />
 

@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background">
+    android:background="#F9FAFB">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -13,15 +13,15 @@
         android:background="@android:color/transparent"
         app:elevation="0dp">
 
-        <!-- Header Image -->
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="280dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:contentScrim="@android:color/transparent"
             app:expandedTitleMarginStart="24dp"
             app:expandedTitleMarginBottom="24dp">
 
+            <!-- Header Image -->
             <ImageView
                 android:id="@+id/headerImage"
                 android:layout_width="match_parent"
@@ -36,12 +36,13 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/gradient_overlay" />
 
-            <!-- Back and Delete Buttons -->
+            <!-- Top Buttons -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="16dp"
+                android:layout_marginTop="16dp"
                 android:gravity="center_vertical">
 
                 <ImageButton
@@ -57,6 +58,16 @@
                     android:layout_width="0dp"
                     android:layout_height="1dp"
                     android:layout_weight="1" />
+
+                <ImageButton
+                    android:id="@+id/changeImageButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/circle_button_background"
+                    android:src="@android:drawable/ic_menu_gallery"
+                    android:tint="@android:color/white"
+                    android:contentDescription="Mudar imagem" />
 
                 <ImageButton
                     android:id="@+id/deleteDetailButton"
@@ -93,7 +104,7 @@
                 android:text="Segunda, 1 de Janeiro de 2024"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="@color/accent"
+                android:textColor="#6366F1"
                 android:layout_marginBottom="8dp" />
 
             <!-- Word Count -->
@@ -103,25 +114,25 @@
                 android:layout_height="wrap_content"
                 android:text="150 palavras"
                 android:textSize="12sp"
-                android:textColor="@color/secondary_text"
+                android:textColor="#9CA3AF"
                 android:layout_marginBottom="24dp" />
 
             <!-- Content Card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
                 app:cardBackgroundColor="@android:color/white">
 
                 <TextView
                     android:id="@+id/detailContent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="20dp"
+                    android:padding="24dp"
                     android:text="Conteúdo do diário..."
                     android:textSize="16sp"
-                    android:textColor="@color/primary_text"
+                    android:textColor="#1F2937"
                     android:lineSpacingExtra="6dp"
                     android:fontFamily="sans-serif" />
 

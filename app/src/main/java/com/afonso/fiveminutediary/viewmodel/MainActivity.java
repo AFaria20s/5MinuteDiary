@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
         String text = entryInput.getText().toString().trim();
 
         if (text.isEmpty()) {
-            Toast.makeText(this, "Escreve algo primeiro 📝", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Escreve algo primeiro", Toast.LENGTH_SHORT).show();
         } else {
             repo.addOrUpdateEntry(System.currentTimeMillis(), text);
             Toast.makeText(this, "Guardado ✓", Toast.LENGTH_SHORT).show();

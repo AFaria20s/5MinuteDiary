@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,17 +14,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.afonso.fiveminutediary.R;
 import com.afonso.fiveminutediary.data.DiaryEntry;
-import com.afonso.fiveminutediary.utils.DiaryUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class DiaryAdapter extends RecyclerView.Adapter<DiaryAdapter.ViewHolder> {
+public class DiaryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<DiaryEntry> entries = new ArrayList<>();
+    private static final int TYPE_HEADER = 0;
+    private static final int TYPE_ENTRY = 1;
+
+    private List<Object> items = new ArrayList<>(); // Mixed list of headers and entries
     private Context context;
     private OnEntryClickListener listener;
 
@@ -40,76 +42,136 @@ public class DiaryAdapter extends RecyclerView.Adapter<DiaryAdapter.ViewHolder> 
     }
 
     public void setEntries(List<DiaryEntry> entries) {
-        this.entries = entries;
+        items.clear();
+
+        if (entries.isEmpty()) {
+            notifyDataSetChanged();
+            return;
+        }
+
+        // Group entries by month/year
+        String currentMonthYear = "";
+        SimpleDateFormat monthYearFormat = new SimpleDateFormat("MMMM yyyy", new Locale("pt", "PT"));
+
+        for (DiaryEntry entry : entries) {
+            String entryMonthYear = monthYearFormat.format(new Date(entry.getTimestamp()));
+
+            if (!entryMonthYear.equals(currentMonthYear)) {
+                // Add month header
+                items.add(entryMonthYear);
+                currentMonthYear = entryMonthYear;
+            }
+
+            // Add entry
+            items.add(entry);
+        }
+
         notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return items.get(position) instanceof String ? TYPE_HEADER : TYPE_ENTRY;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_diary_entry, parent, false);
-        return new ViewHolder(view);
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType == TYPE_HEADER) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_month_header, parent, false);
+            return new HeaderViewHolder(view);
+        } else {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_diary_entry, parent, false);
+            return new EntryViewHolder(view);
+        }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        DiaryEntry entry = entries.get(position);
-
-        // Format date
-        SimpleDateFormat sdf = new SimpleDateFormat("d MMM yyyy", new Locale("pt", "PT"));
-        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", new Locale("pt", "PT"));
-
-        holder.dateText.setText(sdf.format(new Date(entry.getTimestamp())));
-        holder.dayText.setText(dayFormat.format(new Date(entry.getTimestamp())));
-
-        // Preview text (first 100 characters)
-        String preview = entry.getText();
-        if (preview.length() > 100) {
-            preview = preview.substring(0, 100) + "...";
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof HeaderViewHolder) {
+            String monthYear = (String) items.get(position);
+            ((HeaderViewHolder) holder).bind(monthYear);
+        } else if (holder instanceof EntryViewHolder) {
+            DiaryEntry entry = (DiaryEntry) items.get(position);
+            ((EntryViewHolder) holder).bind(entry);
         }
-        holder.previewText.setText(preview);
-
-        // Set image based on entry
-        holder.entryImage.setImageResource(DiaryUtils.getImageForEntry(entry));
-
-        // Click listeners
-        holder.itemView.setOnClickListener(v -> listener.onEntryClick(entry));
-
-        holder.deleteButton.setOnClickListener(v -> showDeleteConfirmation(entry));
     }
 
     @Override
     public int getItemCount() {
-        return entries.size();
+        return items.size();
     }
 
-    private void showDeleteConfirmation(DiaryEntry entry) {
-        new AlertDialog.Builder(context)
-                .setTitle("Eliminar entrada")
-                .setMessage("Tens a certeza?")
-                .setPositiveButton("Eliminar", (dialog, which) -> {
-                    listener.onDeleteClick(entry);
-                    Toast.makeText(context, "Entrada eliminada", Toast.LENGTH_SHORT).show();
-                })
-                .setNegativeButton("Cancelar", null)
-                .show();
+    // Header ViewHolder
+    class HeaderViewHolder extends RecyclerView.ViewHolder {
+        TextView monthYearText;
+
+        HeaderViewHolder(View view) {
+            super(view);
+            monthYearText = view.findViewById(R.id.monthYearText);
+        }
+
+        void bind(String monthYear) {
+            monthYearText.setText(monthYear);
+        }
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView entryImage;
-        TextView dateText;
-        TextView dayText;
+    // Entry ViewHolder
+    class EntryViewHolder extends RecyclerView.ViewHolder {
+        TextView dayNumber;
+        TextView monthShort;
         TextView previewText;
+        TextView metaText;
         ImageButton deleteButton;
 
-        ViewHolder(View view) {
+        EntryViewHolder(View view) {
             super(view);
-            entryImage = view.findViewById(R.id.entryImage);
-            dateText = view.findViewById(R.id.dateText);
-            dayText = view.findViewById(R.id.dayText);
+            dayNumber = view.findViewById(R.id.dayNumber);
+            monthShort = view.findViewById(R.id.monthShort);
             previewText = view.findViewById(R.id.previewText);
+            metaText = view.findViewById(R.id.metaText);
             deleteButton = view.findViewById(R.id.deleteEntryButton);
+        }
+
+        void bind(DiaryEntry entry) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(entry.getTimestamp());
+
+            // Day number
+            dayNumber.setText(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
+
+            // Month short (Jan, Fev, etc)
+            SimpleDateFormat monthFormat = new SimpleDateFormat("MMM", new Locale("pt", "PT"));
+            monthShort.setText(monthFormat.format(new Date(entry.getTimestamp())));
+
+            // Preview text (first 80 characters)
+            String preview = entry.getText();
+            if (preview.length() > 80) {
+                preview = preview.substring(0, 80) + "...";
+            }
+            previewText.setText(preview);
+
+            // Word count
+            int words = entry.getText().trim().split("\\s+").length;
+            metaText.setText(words + (words == 1 ? " palavra" : " palavras"));
+
+            // Click listeners
+            itemView.setOnClickListener(v -> listener.onEntryClick(entry));
+            deleteButton.setOnClickListener(v -> showDeleteConfirmation(entry));
+        }
+
+        private void showDeleteConfirmation(DiaryEntry entry) {
+            new AlertDialog.Builder(context)
+                    .setTitle("Eliminar entrada")
+                    .setMessage("Tens a certeza?")
+                    .setPositiveButton("Eliminar", (dialog, which) -> {
+                        listener.onDeleteClick(entry);
+                        Toast.makeText(context, "Entrada eliminada", Toast.LENGTH_SHORT).show();
+                    })
+                    .setNegativeButton("Cancelar", null)
+                    .show();
         }
     }
 }

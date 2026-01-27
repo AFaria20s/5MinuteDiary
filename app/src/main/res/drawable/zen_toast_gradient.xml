@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- zen_toast_gradient.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="135"
+        android:startColor="#6366F1"
+        android:centerColor="#8B5CF6"
+        android:endColor="#A855F7"
+        android:type="linear" />
+    <corners android:radius="24dp" />
+</shape>

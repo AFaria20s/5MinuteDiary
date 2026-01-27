@@ -72,6 +72,10 @@ public class DataRepository {
         db.userProfileDao().update(profile);
     }
 
+    public void updateEntry(DiaryEntry entry) {
+        db.diaryDao().update(entry);
+    }
+
     public UserProfile getOrCreateUserProfile() {
         UserProfile profile = db.userProfileDao().getProfile();
         if (profile == null) {

@@ -1,27 +1,48 @@
 package com.afonso.fiveminutediary.viewmodel;
 
 import android.app.AlertDialog;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.afonso.fiveminutediary.R;
 import com.afonso.fiveminutediary.data.DataRepository;
 import com.afonso.fiveminutediary.data.DiaryEntry;
-import com.afonso.fiveminutediary.utils.DiaryUtils;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
 public class DetailActivity extends AppCompatActivity {
 
-    private DiaryEntry entry;
+    private static final int PICK_IMAGE_REQUEST = 1;
+
     private DataRepository repo;
+    private DiaryEntry entry;
+    private ImageView headerImage;
+    private TextView detailDate;
+    private TextView wordCount;
+    private TextView detailContent;
+    private ImageButton backButton;
+    private ImageButton deleteDetailButton;
+    private ImageButton changeImageButton;
+
+    private boolean hasCustomImage = false;
+    private Bitmap selectedImage = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,47 +58,136 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         initViews();
+        loadData();
+        setupListeners();
     }
 
     private void initViews() {
-        TextView dateText = findViewById(R.id.detailDate);
-        TextView contentText = findViewById(R.id.detailContent);
-        TextView wordCountText = findViewById(R.id.wordCount);
-        ImageView headerImage = findViewById(R.id.headerImage);
-        ImageButton backButton = findViewById(R.id.backButton);
-        ImageButton deleteButton = findViewById(R.id.deleteDetailButton);
+        headerImage = findViewById(R.id.headerImage);
+        detailDate = findViewById(R.id.detailDate);
+        wordCount = findViewById(R.id.wordCount);
+        detailContent = findViewById(R.id.detailContent);
+        backButton = findViewById(R.id.backButton);
+        deleteDetailButton = findViewById(R.id.deleteDetailButton);
+        changeImageButton = findViewById(R.id.changeImageButton);
+    }
 
-        // Format date
+    private void loadData() {
+        // Data
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE, d 'de' MMMM 'de' yyyy", new Locale("pt", "PT"));
-        dateText.setText(sdf.format(new Date(entry.getTimestamp())));
-
-        // Set content
-        contentText.setText(entry.getText());
+        detailDate.setText(sdf.format(new Date(entry.getTimestamp())));
 
         // Word count
         int words = entry.getText().trim().split("\\s+").length;
-        wordCountText.setText(words + " palavras");
+        wordCount.setText(words + (words == 1 ? " palavra" : " palavras"));
 
-        // Set header image based on day
-        headerImage.setImageResource(DiaryUtils.getImageForEntry(entry));
+        // Content
+        detailContent.setText(entry.getText());
 
-        // Listeners
-        backButton.setOnClickListener(v -> finish());
-        deleteButton.setOnClickListener(v -> showDeleteConfirmation());
+        // Imagem
+        if (entry.getImagePath() != null) {
+            Bitmap bmp = BitmapFactory.decodeFile(entry.getImagePath());
+            if (bmp != null) {
+                headerImage.setImageBitmap(bmp);
+                hasCustomImage = true;
+                return;
+            }
+        }
+        setDefaultHeaderImage();
     }
+
+
+    private void setDefaultHeaderImage() {
+        // Default gradient background
+        Drawable gradient = getResources().getDrawable(R.drawable.detail_header_gradient, null);
+        headerImage.setImageDrawable(gradient);
+        hasCustomImage = false;
+    }
+
+    private void setupListeners() {
+        backButton.setOnClickListener(v -> finish());
+
+        deleteDetailButton.setOnClickListener(v -> showDeleteConfirmation());
+
+        changeImageButton.setOnClickListener(v -> showImageOptions());
+    }
+
+    private void showImageOptions() {
+        String[] options = hasCustomImage ?
+                new String[]{"Escolher nova imagem", "Voltar à cor padrão"} :
+                new String[]{"Escolher imagem"};
+
+        new AlertDialog.Builder(this)
+                .setTitle("Imagem de fundo")
+                .setItems(options, (dialog, which) -> {
+                    if (hasCustomImage && which == 1) {
+                        // Apagar ficheiro antigo
+                        if (entry.getImagePath() != null) {
+                            File f = new File(entry.getImagePath());
+                            if (f.exists()) f.delete();
+                        }
+                        entry.setImagePath(null);
+                        repo.updateEntry(entry);
+                        setDefaultHeaderImage();
+                    } else {
+                        openImagePicker();
+                    }
+
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    private void openImagePicker() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
+            Uri imageUri = data.getData();
+            if (imageUri != null) {
+                try {
+                    Bitmap selectedBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+
+                    // Salvar bitmap na pasta interna
+                    String filename = "entry_" + entry.getId() + ".png";
+                    File file = new File(getFilesDir(), filename);
+                    FileOutputStream out = new FileOutputStream(file);
+                    selectedBitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                    out.close();
+
+                    // Guardar path no DiaryEntry
+                    entry.setImagePath(file.getAbsolutePath());
+                    repo.updateEntry(entry);
+
+                    // Atualizar UI
+                    headerImage.setImageBitmap(selectedBitmap);
+                    hasCustomImage = true;
+                    Toast.makeText(this, "Imagem atualizada", Toast.LENGTH_SHORT).show();
+
+                } catch (IOException e) {
+                    Toast.makeText(this, "Erro ao carregar imagem", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
 
     private void showDeleteConfirmation() {
         new AlertDialog.Builder(this)
                 .setTitle("Eliminar entrada")
                 .setMessage("Tens a certeza que queres eliminar esta entrada?")
-                .setPositiveButton("Eliminar", (dialog, which) -> deleteEntry())
+                .setPositiveButton("Eliminar", (dialog, which) -> {
+                    repo.deleteEntry(entry);
+                    Toast.makeText(this, "Entrada eliminada", Toast.LENGTH_SHORT).show();
+                    finish();
+                })
                 .setNegativeButton("Cancelar", null)
                 .show();
-    }
-
-    private void deleteEntry() {
-        repo.deleteEntry(entry);
-        Toast.makeText(this, "Entrada eliminada", Toast.LENGTH_SHORT).show();
-        finish();
     }
 }

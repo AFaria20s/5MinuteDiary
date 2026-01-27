@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- item_month_header.xml -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp"
+    android:paddingTop="24dp"
+    android:paddingBottom="12dp">
+
+    <TextView
+        android:id="@+id/monthYearText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Janeiro 2025"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#1F2937" />
+
+    <View
+        android:layout_width="40dp"
+        android:layout_height="3dp"
+        android:background="#6366F1"
+        android:layout_marginTop="8dp" />
+
+</LinearLayout>

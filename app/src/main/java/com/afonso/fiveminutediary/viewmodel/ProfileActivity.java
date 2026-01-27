@@ -15,8 +15,11 @@ import com.afonso.fiveminutediary.data.DiaryEntry;
 import com.afonso.fiveminutediary.data.UserProfile;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -27,7 +30,7 @@ public class ProfileActivity extends AppCompatActivity {
     private EditText nameInput;
     private TextView journeyDaysText;
     private TextView totalEntriesText;
-    private TextView thisMonthText;
+    private TextView streakText;
     private CardView premiumStatsCard;
 
     @Override
@@ -63,7 +66,7 @@ public class ProfileActivity extends AppCompatActivity {
         nameInput = findViewById(R.id.nameInput);
         journeyDaysText = findViewById(R.id.journeyDaysText);
         totalEntriesText = findViewById(R.id.totalEntriesText);
-        thisMonthText = findViewById(R.id.thisMonthText);
+        streakText = findViewById(R.id.streakText);
         premiumStatsCard = findViewById(R.id.premiumStatsCard);
 
         // Save name on focus change
@@ -104,26 +107,74 @@ public class ProfileActivity extends AppCompatActivity {
         int totalEntries = repo.getEntryCount();
         totalEntriesText.setText(String.valueOf(totalEntries));
 
-        // This month entries
-        int thisMonthEntries = getThisMonthEntries();
-        thisMonthText.setText(String.valueOf(thisMonthEntries));
+        // Streak
+        int currentStreak = calculateStreak();
+        streakText.setText(String.valueOf(currentStreak));
     }
 
-    private int getThisMonthEntries() {
+    private int calculateStreak() {
         List<DiaryEntry> allEntries = repo.getEntries();
-        Calendar calendar = Calendar.getInstance();
-        int currentMonth = calendar.get(Calendar.MONTH);
-        int currentYear = calendar.get(Calendar.YEAR);
+        if (allEntries.isEmpty()) {
+            return 0;
+        }
 
-        int count = 0;
+        // Sort by date (already sorted DESC from DB)
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        long todayStart = calendar.getTimeInMillis();
+
+        // Check if we have an entry for today
+        boolean hasToday = false;
         for (DiaryEntry entry : allEntries) {
-            calendar.setTimeInMillis(entry.getTimestamp());
-            if (calendar.get(Calendar.MONTH) == currentMonth &&
-                    calendar.get(Calendar.YEAR) == currentYear) {
-                count++;
+            if (entry.getTimestamp() >= todayStart) {
+                hasToday = true;
+                break;
             }
         }
-        return count;
+
+        // Start counting streak from today or yesterday
+        if (!hasToday) {
+            // If no entry today, start from yesterday
+            calendar.add(Calendar.DAY_OF_YEAR, -1);
+        }
+
+        int streak = 0;
+        long currentDayStart = calendar.getTimeInMillis();
+
+        // Go backwards checking consecutive days
+        for (int i = 0; i < 365; i++) { // Max 1 year streak
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+
+            long dayStart = calendar.getTimeInMillis();
+            calendar.add(Calendar.DAY_OF_YEAR, 1);
+            long dayEnd = calendar.getTimeInMillis();
+            calendar.add(Calendar.DAY_OF_YEAR, -1);
+
+            // Check if we have an entry for this day
+            boolean foundEntryForDay = false;
+            for (DiaryEntry entry : allEntries) {
+                if (entry.getTimestamp() >= dayStart && entry.getTimestamp() < dayEnd) {
+                    foundEntryForDay = true;
+                    break;
+                }
+            }
+
+            if (foundEntryForDay) {
+                streak++;
+                calendar.add(Calendar.DAY_OF_YEAR, -1); // Move to previous day
+            } else {
+                break; // Streak broken
+            }
+        }
+
+        return streak;
     }
 
     private void saveName() {

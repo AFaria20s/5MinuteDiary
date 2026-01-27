@@ -17,29 +17,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Header -->
+        <!-- Minimal Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp"
-            android:paddingTop="16dp">
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="16dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Histórico"
-                android:textSize="32sp"
+                android:textSize="24sp"
                 android:textStyle="bold"
                 android:textColor="#1F2937" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="As tuas memórias"
-                android:textSize="14sp"
-                android:textColor="#6B7280"
-                android:layout_marginTop="4dp" />
 
         </LinearLayout>
 
@@ -54,10 +48,8 @@
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="16dp"
-                android:clipToPadding="false" />
+                android:clipToPadding="false"
+                android:paddingBottom="16dp" />
 
             <!-- Empty State -->
             <LinearLayout
@@ -69,25 +61,24 @@
                 android:padding="48dp"
                 android:visibility="gone">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="📝"
-                    android:textSize="64sp"
-                    android:layout_marginBottom="16dp" />
+                <View
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:background="@drawable/empty_state_circle"
+                    android:layout_marginBottom="24dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Ainda não há entradas"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="#1F2937" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Começa a escrever hoje!"
+                    android:text="Começa a escrever hoje"
                     android:textSize="14sp"
                     android:textColor="#6B7280"
                     android:layout_marginTop="8dp" />
