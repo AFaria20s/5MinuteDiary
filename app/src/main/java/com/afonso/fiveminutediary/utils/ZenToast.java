@@ -30,7 +30,7 @@ public class ZenToast {
         Toast toast = new Toast(context);
         toast.setDuration(Toast.LENGTH_SHORT);
         toast.setView(layout);
-        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.setGravity(Gravity.TOP, 0, 60);
         toast.show();
 
         // Vibrate if requested
@@ -51,20 +51,20 @@ public class ZenToast {
      * Get appropriate message for streak
      */
     private static String getStreakMessage(int streak) {
-        if (streak == 1) {
-            return "✨ Começaste a tua jornada!";
+        if (streak <= 1) {
+            return "Começaste a tua jornada!";
         } else if (streak == 2) {
-            return "🌱 2 dias consecutivos!";
+            return "2 dias consecutivos!";
         } else if (streak == 3) {
-            return "🔥 3 dias! Está a criar-se o hábito";
+            return "3 dias! Está a criar-se o hábito";
         } else if (streak == 7) {
-            return "⭐ Uma semana inteira! Incrível!";
+            return "Uma semana inteira! Incrível!";
         } else if (streak == 14) {
-            return "🎯 2 semanas! Continua assim!";
+            return "2 semanas! Continua assim!";
         } else if (streak == 30) {
-            return "🏆 Um mês completo! És uma inspiração!";
+            return "Um mês completo! És uma inspiração!";
         } else if (streak % 10 == 0) {
-            return "🌟 " + streak + " dias! Extraordinário!";
+            return streak + " dias! Extraordinário!";
         } else {
             return "✓ " + streak + " dias seguidos";
         }

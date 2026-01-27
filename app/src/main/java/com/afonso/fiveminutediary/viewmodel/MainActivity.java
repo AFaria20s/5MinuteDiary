@@ -18,6 +18,7 @@ import androidx.cardview.widget.CardView;
 import com.afonso.fiveminutediary.R;
 import com.afonso.fiveminutediary.data.DataRepository;
 import com.afonso.fiveminutediary.data.DiaryEntry;
+import com.afonso.fiveminutediary.utils.ZenToast;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.SimpleDateFormat;
@@ -143,12 +144,20 @@ public class MainActivity extends AppCompatActivity {
 
         if (text.isEmpty()) {
             Toast.makeText(this, "Escreve algo primeiro", Toast.LENGTH_SHORT).show();
-        } else {
-            repo.addOrUpdateEntry(System.currentTimeMillis(), text);
-            Toast.makeText(this, "Guardado ✓", Toast.LENGTH_SHORT).show();
-            loadTodayEntry();
+            return;
         }
+
+        repo.addOrUpdateEntry(System.currentTimeMillis(), text);
+
+        if (todaysEntry == null) {
+            ZenToast.showStreakIncrease(this, repo.calculateStreak());
+        }
+
+        Toast.makeText(this, "Guardado", Toast.LENGTH_SHORT).show();
+
+        loadTodayEntry();
     }
+
 
     private void showDeleteConfirmation() {
         new AlertDialog.Builder(this)
