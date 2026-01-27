@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- lock_circle.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background circle -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#FFFFFF" />
+            <size android:width="40dp" android:height="40dp" />
+        </shape>
+    </item>
+
+    <!-- Lock icon (simplified) -->
+    <item
+        android:width="20dp"
+        android:height="20dp"
+        android:gravity="center">
+        <shape android:shape="rectangle">
+            <solid android:color="#F59E0B" />
+            <corners android:radius="3dp" />
+        </shape>
+    </item>
+</layer-list>
