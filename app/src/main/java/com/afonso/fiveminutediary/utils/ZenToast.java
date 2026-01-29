@@ -1,12 +1,18 @@
 package com.afonso.fiveminutediary.utils;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.OvershootInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,9 +21,9 @@ import com.afonso.fiveminutediary.R;
 public class ZenToast {
 
     /**
-     * Show a beautiful zen-style toast with optional vibration
+     * Show a beautiful zen-style toast with optional vibration and smooth animations
      */
-    public static void show(Context context, String message, boolean withVibration) {
+    public static void show(Context context, String message, int position, boolean withVibration) {
         // Inflate custom layout
         LayoutInflater inflater = LayoutInflater.from(context);
         View layout = inflater.inflate(R.layout.zen_toast, null);
@@ -26,12 +32,32 @@ public class ZenToast {
         TextView textView = layout.findViewById(R.id.toast_text);
         textView.setText(message);
 
+        // Initial state for animation
+        layout.setAlpha(0f);
+        layout.setScaleX(0.8f);
+        layout.setScaleY(0.8f);
+
         // Create and show toast
         Toast toast = new Toast(context);
         toast.setDuration(Toast.LENGTH_SHORT);
         toast.setView(layout);
-        toast.setGravity(Gravity.TOP, 0, 60);
+
+        switch (position) {
+            case Gravity.TOP:
+                toast.setGravity(Gravity.TOP, 0, 100);
+                break;
+            case Gravity.BOTTOM:
+                toast.setGravity(Gravity.BOTTOM, 0, 100);
+                break;
+            default:
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                break;
+        }
+
         toast.show();
+
+        // Animate entrance - smooth scale + fade with bounce
+        animateToastEntrance(layout);
 
         // Vibrate if requested
         if (withVibration) {
@@ -40,11 +66,51 @@ public class ZenToast {
     }
 
     /**
-     * Show streak celebration toast
+     * Animate toast entrance with scale, fade and bounce effect
+     */
+    private static void animateToastEntrance(View view) {
+        // Fade in
+        ObjectAnimator fadeIn = ObjectAnimator.ofFloat(view, "alpha", 0f, 1f);
+        fadeIn.setDuration(300);
+        fadeIn.setInterpolator(new AccelerateDecelerateInterpolator());
+
+        // Scale X with bounce
+        ObjectAnimator scaleX = ObjectAnimator.ofFloat(view, "scaleX", 0.8f, 1.05f, 1f);
+        scaleX.setDuration(400);
+        scaleX.setInterpolator(new OvershootInterpolator(1.5f));
+
+        // Scale Y with bounce
+        ObjectAnimator scaleY = ObjectAnimator.ofFloat(view, "scaleY", 0.8f, 1.05f, 1f);
+        scaleY.setDuration(400);
+        scaleY.setInterpolator(new OvershootInterpolator(1.5f));
+
+        // Play all together
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(fadeIn, scaleX, scaleY);
+        animatorSet.start();
+
+        // Optional: Add subtle exit animation before toast disappears
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            animateToastExit(view);
+        }, 1700); // Start exit animation before toast auto-dismisses
+    }
+
+    /**
+     * Animate toast exit with fade out
+     */
+    private static void animateToastExit(View view) {
+        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f);
+        fadeOut.setDuration(200);
+        fadeOut.setInterpolator(new AccelerateDecelerateInterpolator());
+        fadeOut.start();
+    }
+
+    /**
+     * Show streak celebration toast with enhanced animations
      */
     public static void showStreakIncrease(Context context, int newStreak) {
         String message = getStreakMessage(newStreak);
-        show(context, message, true);
+        show(context, message, Gravity.TOP, true);
     }
 
     /**
@@ -52,19 +118,21 @@ public class ZenToast {
      */
     private static String getStreakMessage(int streak) {
         if (streak <= 1) {
-            return "Começaste a tua jornada!";
+            return "✨ Começaste a tua jornada!";
         } else if (streak == 2) {
-            return "2 dias consecutivos!";
+            return "🌱 2 dias consecutivos!";
         } else if (streak == 3) {
-            return "3 dias! Está a criar-se o hábito";
+            return "🔥 3 dias! O hábito está a criar-se";
         } else if (streak == 7) {
-            return "Uma semana inteira! Incrível!";
+            return "⭐ Uma semana inteira! Incrível!";
         } else if (streak == 14) {
-            return "2 semanas! Continua assim!";
+            return "🎯 2 semanas! Continua assim!";
         } else if (streak == 30) {
-            return "Um mês completo! És uma inspiração!";
+            return "🏆 Um mês completo! Inspirador!";
+        } else if (streak == 100) {
+            return "💎 100 dias! Lendário!";
         } else if (streak % 10 == 0) {
-            return streak + " dias! Extraordinário!";
+            return "🌟 " + streak + " dias! Extraordinário!";
         } else {
             return "✓ " + streak + " dias seguidos";
         }

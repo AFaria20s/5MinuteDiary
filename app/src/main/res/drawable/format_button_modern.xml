@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/drawable/format_button_modern.xml -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#30667eea">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#F3F4F6" />
+            <stroke
+                android:width="2dp"
+                android:color="#E5E7EB" />
+        </shape>
+    </item>
+</ripple>

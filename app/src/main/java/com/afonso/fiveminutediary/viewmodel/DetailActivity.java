@@ -42,7 +42,6 @@ public class DetailActivity extends AppCompatActivity {
     private ImageButton changeImageButton;
 
     private boolean hasCustomImage = false;
-    private Bitmap selectedImage = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,18 +72,24 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void loadData() {
-        // Data
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE, d 'de' MMMM 'de' yyyy", new Locale("pt", "PT"));
         detailDate.setText(sdf.format(new Date(entry.getTimestamp())));
 
-        // Word count
         int words = entry.getText().trim().split("\\s+").length;
         wordCount.setText(words + (words == 1 ? " palavra" : " palavras"));
 
-        // Content
-        detailContent.setText(entry.getText());
+        // Carregar texto com formatação
+        String formatting = entry.getFormatting();
+        if (formatting != null && !formatting.isEmpty()) {
+            android.text.SpannableString formatted =
+                    com.afonso.fiveminutediary.data.TextFormattingSerializer.deserializeFormatting(
+                            entry.getText(), formatting
+                    );
+            detailContent.setText(formatted);
+        } else {
+            detailContent.setText(entry.getText());
+        }
 
-        // Imagem
         if (entry.getImagePath() != null) {
             Bitmap bmp = BitmapFactory.decodeFile(entry.getImagePath());
             if (bmp != null) {
@@ -96,9 +101,7 @@ public class DetailActivity extends AppCompatActivity {
         setDefaultHeaderImage();
     }
 
-
     private void setDefaultHeaderImage() {
-        // Default gradient background
         Drawable gradient = getResources().getDrawable(R.drawable.detail_header_gradient, null);
         headerImage.setImageDrawable(gradient);
         hasCustomImage = false;
@@ -121,18 +124,16 @@ public class DetailActivity extends AppCompatActivity {
                 .setTitle("Imagem de fundo")
                 .setItems(options, (dialog, which) -> {
                     if (hasCustomImage && which == 1) {
-                        // Apagar ficheiro antigo
                         if (entry.getImagePath() != null) {
                             File f = new File(entry.getImagePath());
                             if (f.exists()) f.delete();
                         }
                         entry.setImagePath(null);
-                        repo.updateEntry(entry);
+                        repo.updateEntry(entry, null);
                         setDefaultHeaderImage();
                     } else {
                         openImagePicker();
                     }
-
                 })
                 .setNegativeButton("Cancelar", null)
                 .show();
@@ -154,21 +155,20 @@ public class DetailActivity extends AppCompatActivity {
                 try {
                     Bitmap selectedBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
 
-                    // Salvar bitmap na pasta interna
                     String filename = "entry_" + entry.getId() + ".png";
                     File file = new File(getFilesDir(), filename);
                     FileOutputStream out = new FileOutputStream(file);
                     selectedBitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
                     out.close();
 
-                    // Guardar path no DiaryEntry
                     entry.setImagePath(file.getAbsolutePath());
-                    repo.updateEntry(entry);
-
-                    // Atualizar UI
-                    headerImage.setImageBitmap(selectedBitmap);
-                    hasCustomImage = true;
-                    Toast.makeText(this, "Imagem atualizada", Toast.LENGTH_SHORT).show();
+                    repo.updateEntry(entry, task -> {
+                        runOnUiThread(() -> {
+                            headerImage.setImageBitmap(selectedBitmap);
+                            hasCustomImage = true;
+                            Toast.makeText(this, "Imagem atualizada", Toast.LENGTH_SHORT).show();
+                        });
+                    });
 
                 } catch (IOException e) {
                     Toast.makeText(this, "Erro ao carregar imagem", Toast.LENGTH_SHORT).show();
@@ -177,15 +177,17 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
-
     private void showDeleteConfirmation() {
         new AlertDialog.Builder(this)
                 .setTitle("Eliminar entrada")
                 .setMessage("Tens a certeza que queres eliminar esta entrada?")
                 .setPositiveButton("Eliminar", (dialog, which) -> {
-                    repo.deleteEntry(entry);
-                    Toast.makeText(this, "Entrada eliminada", Toast.LENGTH_SHORT).show();
-                    finish();
+                    repo.deleteEntry(entry, task -> {
+                        runOnUiThread(() -> {
+                            Toast.makeText(this, "Entrada eliminada", Toast.LENGTH_SHORT).show();
+                            finish();
+                        });
+                    });
                 })
                 .setNegativeButton("Cancelar", null)
                 .show();

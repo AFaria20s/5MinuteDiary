@@ -10,12 +10,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.afonso.fiveminutediary.R;
+import com.afonso.fiveminutediary.adapter.DiaryAdapter;
 import com.afonso.fiveminutediary.data.DataRepository;
 import com.afonso.fiveminutediary.data.DiaryEntry;
-import com.afonso.fiveminutediary.adapter.DiaryAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import java.util.List;
 
 public class ListActivity extends AppCompatActivity implements DiaryAdapter.OnEntryClickListener {
 
@@ -27,6 +25,10 @@ public class ListActivity extends AppCompatActivity implements DiaryAdapter.OnEn
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // VERIFICAR AUTENTICAÇÃO
+        checkAuthentication();
+
         setContentView(R.layout.activity_list);
 
         repo = DataRepository.getInstance(this);
@@ -39,11 +41,33 @@ public class ListActivity extends AppCompatActivity implements DiaryAdapter.OnEn
     @Override
     protected void onResume() {
         super.onResume();
-        loadEntries();
 
-        // Reset bottom navigation selection when returning to this activity
+        // Iniciar listener em tempo real
+        startRealtimeUpdates();
+
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
         bottomNav.setSelectedItemId(R.id.nav_history);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // Parar listener para economizar recursos
+        repo.stopEntriesListener();
+    }
+
+    /**
+     * Verifica se o utilizador está autenticado
+     */
+    private void checkAuthentication() {
+        com.google.firebase.auth.FirebaseAuth auth = com.google.firebase.auth.FirebaseAuth.getInstance();
+        if (auth.getCurrentUser() == null) {
+            Intent intent = new Intent(this, com.afonso.fiveminutediary.auth.LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        }
     }
 
     private void initViews() {
@@ -81,9 +105,32 @@ public class ListActivity extends AppCompatActivity implements DiaryAdapter.OnEn
         });
     }
 
-    private void loadEntries() {
-        List<DiaryEntry> entries = repo.getEntries();
+    /**
+     * Iniciar updates em tempo real
+     */
+    private void startRealtimeUpdates() {
+        repo.startEntriesListener(entries -> {
+            runOnUiThread(() -> {
+                updateUI(entries);
+            });
+        });
+    }
 
+    /**
+     * Carregar entries (inicial)
+     */
+    private void loadEntries() {
+        repo.getEntries(entries -> {
+            runOnUiThread(() -> {
+                updateUI(entries);
+            });
+        });
+    }
+
+    /**
+     * Atualizar UI com entries
+     */
+    private void updateUI(java.util.List<DiaryEntry> entries) {
         if (entries.isEmpty()) {
             recyclerView.setVisibility(View.GONE);
             emptyView.setVisibility(View.VISIBLE);
@@ -103,7 +150,10 @@ public class ListActivity extends AppCompatActivity implements DiaryAdapter.OnEn
 
     @Override
     public void onDeleteClick(DiaryEntry entry) {
-        repo.deleteEntry(entry);
-        loadEntries();
+        repo.deleteEntry(entry, task -> {
+            runOnUiThread(() -> {
+                android.widget.Toast.makeText(this, "Entrada eliminada", android.widget.Toast.LENGTH_SHORT).show();
+            });
+        });
     }
 }

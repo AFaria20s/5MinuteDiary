@@ -311,15 +311,70 @@
 
                 </androidx.cardview.widget.CardView>
 
+                <!-- Substituir a secção de Settings por isto: -->
+
                 <!-- Settings Section -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Preferências"
+                    android:text="Definições"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:textColor="#1F2937"
-                    android:layout_marginBottom="16dp" />
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginTop="8dp" />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    android:layout_marginBottom="16dp"
+                    app:cardBackgroundColor="@android:color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <!-- Logout Button -->
+                        <Button
+                            android:id="@+id/logoutButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:text="Terminar Sessão"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:backgroundTint="#6366F1"
+                            android:textColor="@android:color/white"
+                            app:cornerRadius="12dp"
+                            android:layout_marginBottom="12dp"
+                            app:icon="@android:drawable/ic_lock_power_off"
+                            app:iconGravity="textStart"
+                            app:iconPadding="8dp" />
+
+                        <!-- Delete Account Button -->
+                        <Button
+                            android:id="@+id/deleteAccountButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:text="Eliminar Conta"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:textColor="@color/error"
+                            app:strokeColor="@color/error"
+                            app:strokeWidth="2dp"
+                            app:cornerRadius="12dp"
+                            app:icon="@android:drawable/ic_menu_delete"
+                            app:iconTint="@color/error"
+                            app:iconGravity="textStart"
+                            app:iconPadding="8dp" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
 
                 <!-- About Card -->
                 <androidx.cardview.widget.CardView

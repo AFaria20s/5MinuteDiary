@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- breathing_circle.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <gradient
+        android:angle="135"
+        android:startColor="#E0E7FF"
+        android:endColor="#C7D2FE"
+        android:type="linear" />
+    <size android:width="64dp" android:height="64dp" />
+</shape>

@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FAFAFA">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/rootCard"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="@android:color/white">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <!-- Header with Gradient -->
+            <LinearLayout
+                android:id="@+id/headerLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="30dp"
+                android:paddingBottom="20dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:background="@drawable/profile_gradient"
+                android:elevation="6dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageButton
+                        android:id="@+id/closeButton"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="@drawable/circular_ripple_button"
+                        android:src="@android:drawable/ic_menu_close_clear_cancel"
+                        android:tint="#FFFFFF"
+                        android:contentDescription="Fechar" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Editor"
+                        android:textSize="22sp"
+                        android:textColor="#FFFFFF"
+                        android:fontFamily="sans-serif-light"
+                        android:letterSpacing="0.05"
+                        android:gravity="center"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp" />
+
+                    <ImageButton
+                        android:id="@+id/toggleFormattingButton"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="@drawable/circular_ripple_button"
+                        android:src="@android:drawable/ic_menu_edit"
+                        android:tint="#FFFFFF"
+                        android:layout_marginEnd="8dp"
+                        android:contentDescription="Formatação" />
+
+                    <ImageButton
+                        android:id="@+id/undoButton"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="@drawable/circular_ripple_button"
+                        android:src="@android:drawable/ic_menu_revert"
+                        android:tint="#FFFFFF"
+                        android:layout_marginEnd="8dp"
+                        android:contentDescription="Desfazer" />
+
+                    <ImageButton
+                        android:id="@+id/redoButton"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="@drawable/circular_ripple_button"
+                        android:src="@android:drawable/ic_menu_revert"
+                        android:tint="#FFFFFF"
+                        android:rotation="180"
+                        android:contentDescription="Refazer" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/charCountText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 caracteres"
+                    android:textSize="12sp"
+                    android:textColor="#E8E8E8"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:alpha="0.9" />
+
+            </LinearLayout>
+
+            <!-- Writing area -->
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/scrollView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:fillViewport="true"
+                android:clipToPadding="false"
+                app:layout_constraintTop_toBottomOf="@id/headerLayout"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <EditText
+                    android:id="@+id/expandedInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top|start"
+                    android:hint="Começa a escrever..."
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:background="@android:color/transparent"
+                    android:padding="28dp"
+                    android:paddingEnd="110dp"
+                    android:textSize="18sp"
+                    android:textColor="#1a1a1a"
+                    android:textColorHint="#B0B0B0"
+                    android:lineSpacingExtra="10dp"
+                    android:minHeight="400dp"
+                    android:fontFamily="sans-serif" />
+
+            </androidx.core.widget.NestedScrollView>
+
+            <!-- Floating Formatting Panel - Responsive height -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/formattingPanel"
+                android:layout_width="80dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="20dp"
+                android:visibility="gone"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="16dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:layout_constraintTop_toBottomOf="@id/headerLayout"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scrollbars="none"
+                    android:fadeScrollbars="true">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="10dp"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Estilo"
+                            android:textSize="10sp"
+                            android:textColor="#9CA3AF"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="8dp"
+                            android:letterSpacing="0.1" />
+
+                        <ImageButton
+                            android:id="@+id/boldButton"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/format_button_modern"
+                            android:src="@android:drawable/ic_menu_edit"
+                            android:tint="#1F2937"
+                            android:layout_marginBottom="10dp"
+                            android:contentDescription="Negrito" />
+
+                        <ImageButton
+                            android:id="@+id/italicButton"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/format_button_modern"
+                            android:src="@android:drawable/ic_menu_edit"
+                            android:tint="#1F2937"
+                            android:layout_marginBottom="10dp"
+                            android:contentDescription="Itálico" />
+
+                        <ImageButton
+                            android:id="@+id/underlineButton"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/format_button_modern"
+                            android:src="@android:drawable/ic_menu_edit"
+                            android:tint="#1F2937"
+                            android:layout_marginBottom="16dp"
+                            android:contentDescription="Sublinhado" />
+
+                        <View
+                            android:layout_width="40dp"
+                            android:layout_height="2dp"
+                            android:background="#E5E7EB"
+                            android:layout_marginBottom="16dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Realce"
+                            android:textSize="10sp"
+                            android:textColor="#9CA3AF"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="8dp"
+                            android:letterSpacing="0.1" />
+
+                        <ImageButton
+                            android:id="@+id/highlightYellowButton"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/highlight_circle_yellow"
+                            android:layout_marginBottom="10dp"
+                            android:contentDescription="Amarelo" />
+
+                        <ImageButton
+                            android:id="@+id/highlightGreenButton"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/highlight_circle_green"
+                            android:layout_marginBottom="10dp"
+                            android:contentDescription="Verde" />
+
+                        <ImageButton
+                            android:id="@+id/highlightPinkButton"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/highlight_circle_pink"
+                            android:layout_marginBottom="10dp"
+                            android:contentDescription="Rosa" />
+
+                        <ImageButton
+                            android:id="@+id/highlightBlueButton"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/highlight_circle_blue"
+                            android:layout_marginBottom="16dp"
+                            android:contentDescription="Azul" />
+
+                        <View
+                            android:layout_width="40dp"
+                            android:layout_height="2dp"
+                            android:background="#E5E7EB"
+                            android:layout_marginBottom="16dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Cor"
+                            android:textSize="10sp"
+                            android:textColor="#9CA3AF"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="8dp"
+                            android:letterSpacing="0.1" />
+
+                        <ImageButton
+                            android:id="@+id/colorRedButton"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/color_circle_red"
+                            android:layout_marginBottom="10dp"
+                            android:contentDescription="Vermelho" />
+
+                        <ImageButton
+                            android:id="@+id/colorBlueButton"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/color_circle_blue"
+                            android:layout_marginBottom="10dp"
+                            android:contentDescription="Azul" />
+
+                        <ImageButton
+                            android:id="@+id/colorGreenButton"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/color_circle_green"
+                            android:layout_marginBottom="10dp"
+                            android:contentDescription="Verde" />
+
+                    </LinearLayout>
+
+                </ScrollView>
+
+            </androidx.cardview.widget.CardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

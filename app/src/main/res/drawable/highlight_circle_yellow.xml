@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/drawable/highlight_circle_yellow.xml -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#50FEF3C7">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#FEF3C7" />
+            <stroke
+                android:width="2dp"
+                android:color="#FCD34D" />
+        </shape>
+    </item>
+</ripple>

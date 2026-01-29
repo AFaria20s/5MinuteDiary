@@ -4,10 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F9FAFB"
+    android:background="@drawable/subtle_bg_gradient"
     android:fitsSystemWindows="true">
 
-    <!-- Main Content Area -->
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -21,135 +20,211 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center"
-            android:padding="24dp">
+            android:paddingTop="32dp"
+            android:paddingBottom="24dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp">
 
-            <!-- Minimalist Header -->
+            <!-- Elegant Date/Time Header -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:layout_marginBottom="32dp">
+                android:layout_marginBottom="8dp">
 
-                <TextView
-                    android:id="@+id/dateText"
+                <!-- Day and Month -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Segunda, 26 de Janeiro"
-                    android:textSize="16.5sp"
-                    android:textColor="#6B7280"
-                    android:letterSpacing="0.05"
-                    android:fontFamily="sans-serif-light" />
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="4dp">
 
+                    <TextView
+                        android:id="@+id/dayOfWeek"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Segunda"
+                        android:textSize="16sp"
+                        android:textColor="#6B7280"
+                        android:fontFamily="sans-serif-light" />
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="4dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/separator_dot" />
+
+                    <TextView
+                        android:id="@+id/dateText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="27 de Janeiro"
+                        android:textSize="16sp"
+                        android:textColor="#6B7280"
+                        android:fontFamily="sans-serif-light" />
+
+                </LinearLayout>
+
+                <!-- Current Time -->
                 <TextView
+                    android:id="@+id/currentTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="5 Minute Diary"
-                    android:textSize="14sp"
+                    android:text="14:30"
+                    android:textSize="48sp"
+                    android:textColor="#1F2937"
+                    android:fontFamily="sans-serif-thin"
+                    android:letterSpacing="-0.02"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- Motivational Text -->
+                <TextView
+                    android:id="@+id/motivationalText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Respira e escreve"
+                    android:textSize="15sp"
                     android:textColor="#9CA3AF"
-                    android:layout_marginTop="4dp"
-                    android:fontFamily="sans-serif-light" />
+                    android:fontFamily="sans-serif-light"
+                    android:letterSpacing="0.05" />
 
             </LinearLayout>
 
-            <!-- Writing Card - The Focus -->
+            <!-- Clean Writing Card -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/todayCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="20dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="24dp"
                 app:cardElevation="1dp"
-                android:layout_marginBottom="16dp"
                 app:cardBackgroundColor="@android:color/white">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="24dp">
+                    android:padding="28dp">
 
-                    <!-- Simple prompt -->
-                    <TextView
-                        android:id="@+id/promptText"
-                        android:layout_width="wrap_content"
+                    <!-- Simple header -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Conta-me sobre o teu dia!"
-                        android:textSize="20sp"
-                        android:textColor="#1F2937"
-                        android:fontFamily="sans-serif-medium"
-                        android:layout_marginBottom="16dp" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="20dp">
 
-                    <!-- Main writing area - distraction free -->
+                        <TextView
+                            android:id="@+id/promptText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="O que ficou do teu dia?"
+                            android:textSize="16sp"
+                            android:textColor="#6B7280"
+                            android:fontFamily="sans-serif-light" />
+
+                        <ImageButton
+                            android:id="@+id/expandButton"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@android:drawable/ic_menu_zoom"
+                            android:tint="#6366F1"
+                            android:visibility="gone"
+                            android:contentDescription="Expandir edição" />
+
+                    </LinearLayout>
+
+                    <!-- Large writing area -->
                     <EditText
                         android:id="@+id/entryInput"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:minHeight="200dp"
+                        android:layout_height="320dp"
                         android:gravity="top|start"
-                        android:hint="Começa a escrever..."
+                        android:hint="Escreve aqui..."
                         android:inputType="textMultiLine|textCapSentences"
                         android:background="@android:color/transparent"
                         android:padding="0dp"
-                        android:textSize="16sp"
+                        android:textSize="17sp"
                         android:textColor="#1F2937"
                         android:textColorHint="#D1D5DB"
                         android:fontFamily="sans-serif"
-                        android:lineSpacingExtra="8dp" />
+                        android:lineSpacingExtra="8dp"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"/>
 
-                    <!-- Subtle word counter -->
-                    <TextView
-                        android:id="@+id/wordCounter"
-                        android:layout_width="wrap_content"
+                    <!-- Word counter with simple progress -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="0 palavras"
-                        android:textSize="12sp"
-                        android:textColor="#9CA3AF"
-                        android:layout_marginTop="12dp"
-                        android:layout_gravity="end" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="20dp">
+
+                        <!-- Simple progress indicator -->
+                        <ProgressBar
+                            android:id="@+id/wordProgressBar"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="0dp"
+                            android:layout_height="3dp"
+                            android:layout_weight="1"
+                            android:max="100"
+                            android:progress="0"
+                            android:progressTint="#6366F1"
+                            android:progressBackgroundTint="#E5E7EB"
+                            android:layout_marginEnd="16dp" />
+
+                        <TextView
+                            android:id="@+id/wordCounter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 palavras"
+                            android:textSize="13sp"
+                            android:textColor="#9CA3AF" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 
-            <!-- Minimal action buttons -->
-            <LinearLayout
+            <!-- Clean save button -->
+            <Button
+                android:id="@+id/saveButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Guardar"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textAllCaps="false"
+                android:backgroundTint="#6366F1"
+                app:cornerRadius="16dp" />
+
+            <!-- Subtle quote -->
+            <TextView
+                android:id="@+id/dailyQuote"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:text="Escrever é descobrir o que pensamos"
+                android:textSize="13sp"
+                android:textStyle="italic"
+                android:textColor="#9CA3AF"
                 android:gravity="center"
-                android:layout_marginTop="8dp">
-
-                <Button
-                    android:id="@+id/saveButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="56dp"
-                    android:paddingStart="32dp"
-                    android:paddingEnd="32dp"
-                    android:text="Guardar"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textAllCaps="false"
-                    android:backgroundTint="#6366F1" />
-
-                <ImageButton
-                    android:id="@+id/deleteButton"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:layout_marginStart="12dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@android:drawable/ic_menu_delete"
-                    android:visibility="gone"
-                    android:contentDescription="Eliminar entrada"
-                    app:tint="#9CA3AF" />
-
-            </LinearLayout>
+                android:layout_marginTop="28dp"
+                android:lineSpacingExtra="4dp"
+                android:alpha="0.7" />
 
         </LinearLayout>
 
     </ScrollView>
 
-    <!-- Bottom Navigation Bar -->
+    <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="0dp"
@@ -162,7 +237,6 @@
         app:menu="@menu/bottom_nav_menu"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

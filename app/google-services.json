@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "260731883146",
+    "project_id": "minutediary-58095",
+    "storage_bucket": "minutediary-58095.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:260731883146:android:2acf7cb44a44e1dbe92773",
+        "android_client_info": {
+          "package_name": "com.afonso.fiveminutediary"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "260731883146-85vvosskh2v5i99cc0ov6hs33opqsguc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSzAw_fvLP2S96FQE-9LyIdP_eOnUhnXE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "260731883146-85vvosskh2v5i99cc0ov6hs33opqsguc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

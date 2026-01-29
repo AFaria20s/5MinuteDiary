@@ -1,5 +1,9 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
-    alias(libs.plugins.android.application)
+    id("com.android.application")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -35,19 +39,18 @@ dependencies {
     val room_version = "2.8.4"
 
     implementation("androidx.room:room-runtime:$room_version")
-
     // If this project only uses Java source, use the Java annotationProcessor
     // No additional plugins are necessary
     annotationProcessor("androidx.room:room-compiler:$room_version")
     // Material Design
     implementation("com.google.android.material:material:1.11.0")
-// RecyclerView
+    // RecyclerView
     implementation("androidx.recyclerview:recyclerview:1.3.2")
-// CardView
+    // CardView
     implementation("androidx.cardview:cardview:1.0.0")
-// ConstraintLayout
+    // ConstraintLayout
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-// CoordinatorLayout
+    // CoordinatorLayout
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
     // AppCompat
     implementation("androidx.appcompat:appcompat:1.6.1")
@@ -57,4 +60,20 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+    // ========== FIREBASE ==========
+    // Firebase BoM (Bill of Materials) - gerencia versões
+    implementation(platform(libs.firebase.bom))
+
+    // Firebase Authentication
+    implementation( libs.firebase.auth)
+
+    // Firebase Firestore
+    implementation( libs.firebase.firestore)
+
+    // Firebase Analytics (opcional mas recomendado)
+    implementation( libs.firebase.analytics)
+
+    // ========== GOOGLE SIGN IN ==========
+    implementation( libs.play.services.auth)
 }

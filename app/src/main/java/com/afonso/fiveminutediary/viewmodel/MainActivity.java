@@ -1,16 +1,22 @@
 package com.afonso.fiveminutediary.viewmodel;
 
-import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -18,58 +24,148 @@ import androidx.cardview.widget.CardView;
 import com.afonso.fiveminutediary.R;
 import com.afonso.fiveminutediary.data.DataRepository;
 import com.afonso.fiveminutediary.data.DiaryEntry;
+import com.afonso.fiveminutediary.data.TextFormattingSerializer;
 import com.afonso.fiveminutediary.utils.ZenToast;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int REQUEST_EXPANDED_EDIT = 100;
+    private static final long AUTO_SAVE_DELAY = 2000; // 2 seconds
+
     private DataRepository repo;
     private EditText entryInput;
+    private TextView dayOfWeek;
     private TextView dateText;
+    private TextView currentTime;
     private TextView wordCounter;
+    private TextView motivationalText;
+    private TextView dailyQuote;
+    private ProgressBar wordProgressBar;
     private CardView todayCard;
-    private ImageButton deleteButton;
+    private ImageButton expandButton;
+
     private DiaryEntry todaysEntry;
+    private boolean hadEntryToday = false;
+    private boolean isSaving = false;
+
+    private Handler timeHandler;
+    private Runnable timeRunnable;
+    private Handler autoSaveHandler;
+    private Runnable autoSaveRunnable;
+
+    private String[] motivationalTexts = {
+            "Respira e escreve",
+            "O teu momento do dia",
+            "5 minutos para ti",
+            "Escreve livremente",
+            "Os teus pensamentos",
+            "Um momento de calma"
+    };
+
+    private String[] dailyQuotes = {
+            "Escrever é descobrir o que pensamos",
+            "As palavras têm poder",
+            "Cada dia é uma nova página",
+            "A escrita cura",
+            "Os pensamentos ganham vida ao serem escritos",
+            "Um diário é um amigo silencioso"
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Check authentication
+        if (!checkAuthentication()) {
+            return;
+        }
+
         setContentView(R.layout.activity_main);
 
         repo = DataRepository.getInstance(this);
+        autoSaveHandler = new Handler(Looper.getMainLooper());
 
         initViews();
         loadTodayEntry();
         setupListeners();
         setupBottomNavigation();
+        setRandomTexts();
+        startClock();
+        animateEntrance();
+        setupAutoSave();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        loadTodayEntry();
+        if (!checkAuthentication()) return;
 
-        // Reset bottom navigation selection when returning to this activity
+        loadTodayEntry();
+        startClock();
+
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
         bottomNav.setSelectedItemId(R.id.nav_home);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (entryInput != null) {
+            entryInput.clearFocus();
+        }
+
+        stopClock();
+        saveCurrentEntry();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (autoSaveHandler != null && autoSaveRunnable != null) {
+            autoSaveHandler.removeCallbacks(autoSaveRunnable);
+        }
+    }
+
+    private boolean checkAuthentication() {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        if (auth.getCurrentUser() == null) {
+            Intent intent = new Intent(this, com.afonso.fiveminutediary.auth.LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return false;
+        }
+        return true;
+    }
+
     private void initViews() {
         entryInput = findViewById(R.id.entryInput);
+        dayOfWeek = findViewById(R.id.dayOfWeek);
         dateText = findViewById(R.id.dateText);
+        currentTime = findViewById(R.id.currentTime);
         wordCounter = findViewById(R.id.wordCounter);
+        motivationalText = findViewById(R.id.motivationalText);
+        dailyQuote = findViewById(R.id.dailyQuote);
+        wordProgressBar = findViewById(R.id.wordProgressBar);
         todayCard = findViewById(R.id.todayCard);
-        deleteButton = findViewById(R.id.deleteButton);
+        expandButton = findViewById(R.id.expandButton);
 
-        // Set today's date
-        SimpleDateFormat sdf = new SimpleDateFormat("EEEE, d 'de' MMMM", new Locale("pt", "PT"));
-        dateText.setText(sdf.format(new Date()));
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", new Locale("pt", "PT"));
+        SimpleDateFormat dayOfMonthFormat = new SimpleDateFormat("d", new Locale("pt", "PT"));
+        SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM", new Locale("pt", "PT"));
 
-        // Word counter
+        Date now = new Date();
+        dayOfWeek.setText(capitalize(dayFormat.format(now)));
+        dateText.setText(dayOfMonthFormat.format(now) + " de " + capitalize(monthFormat.format(now)));
+
         entryInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -77,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 updateWordCount(s.toString());
+                scheduleAutoSave();
             }
 
             @Override
@@ -84,33 +181,204 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void setupAutoSave() {
+        autoSaveRunnable = this::saveCurrentEntry;
+    }
+
+    private void scheduleAutoSave() {
+        if (autoSaveHandler != null && autoSaveRunnable != null) {
+            autoSaveHandler.removeCallbacks(autoSaveRunnable);
+            autoSaveHandler.postDelayed(autoSaveRunnable, AUTO_SAVE_DELAY);
+        }
+    }
+
+    private void saveCurrentEntry() {
+        String text = entryInput.getText().toString().trim();
+        if (text.isEmpty() || isSaving) {
+            return;
+        }
+
+        isSaving = true;
+        boolean isFirstEntry = !hadEntryToday;
+
+        // Extract formatting
+        CharSequence formattedText = entryInput.getText();
+        String formatting = TextFormattingSerializer.serializeFormatting(formattedText);
+
+        repo.saveOrUpdateTodayEntry(text, formatting, task -> {
+            runOnUiThread(() -> {
+                isSaving = false;
+                if (isFirstEntry) {
+                    hadEntryToday = true;
+                    expandButton.setVisibility(android.view.View.VISIBLE);
+                }
+            });
+        });
+    }
+
+    private void startClock() {
+        if (timeHandler == null) {
+            timeHandler = new Handler(Looper.getMainLooper());
+        }
+
+        timeRunnable = new Runnable() {
+            @Override
+            public void run() {
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                currentTime.setText(timeFormat.format(new Date()));
+                timeHandler.postDelayed(this, 1000);
+            }
+        };
+
+        timeHandler.post(timeRunnable);
+    }
+
+    private void stopClock() {
+        if (timeHandler != null && timeRunnable != null) {
+            timeHandler.removeCallbacks(timeRunnable);
+        }
+    }
+
     private void updateWordCount(String text) {
         if (text.trim().isEmpty()) {
             wordCounter.setText("0 palavras");
+            wordProgressBar.setProgress(0);
         } else {
             int words = text.trim().split("\\s+").length;
             wordCounter.setText(words + (words == 1 ? " palavra" : " palavras"));
+            int progress = Math.min((words * 100) / 50, 100);
+            wordProgressBar.setProgress(progress);
         }
     }
 
     private void loadTodayEntry() {
-        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-        todaysEntry = repo.getEntryForDay(today);
+        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                .format(new Date());
 
-        if (todaysEntry != null) {
-            entryInput.setText(todaysEntry.getText());
-            deleteButton.setVisibility(View.VISIBLE);
-        } else {
-            entryInput.setText("");
-            deleteButton.setVisibility(View.GONE);
-        }
+        repo.getEntryForDay(today, entry -> {
+            runOnUiThread(() -> {
+                todaysEntry = entry;
+                if (todaysEntry != null) {
+                    // Load text with formatting
+                    String formatting = todaysEntry.getFormatting();
+                    if (formatting != null && !formatting.isEmpty()) {
+                        android.text.SpannableString formatted =
+                                TextFormattingSerializer.deserializeFormatting(
+                                        todaysEntry.getText(), formatting
+                                );
+                        entryInput.setText(formatted);
+                    } else {
+                        entryInput.setText(todaysEntry.getText());
+                    }
+                    expandButton.setVisibility(android.view.View.VISIBLE);
+                    hadEntryToday = true;
+                } else {
+                    entryInput.setText("");
+                    expandButton.setVisibility(android.view.View.GONE);
+                    hadEntryToday = false;
+                }
+            });
+        });
+    }
+
+    private void setRandomTexts() {
+        Random random = new Random();
+        motivationalText.setText(motivationalTexts[random.nextInt(motivationalTexts.length)]);
+        dailyQuote.setText(dailyQuotes[random.nextInt(dailyQuotes.length)]);
+    }
+
+    private void animateEntrance() {
+        todayCard.setAlpha(0f);
+        todayCard.animate()
+                .alpha(1f)
+                .setDuration(500)
+                .start();
     }
 
     private void setupListeners() {
         Button saveButton = findViewById(R.id.saveButton);
 
-        saveButton.setOnClickListener(v -> saveEntry());
-        deleteButton.setOnClickListener(v -> showDeleteConfirmation());
+        saveButton.setOnClickListener(v -> {
+            v.animate()
+                    .scaleX(0.97f)
+                    .scaleY(0.97f)
+                    .setDuration(100)
+                    .withEndAction(() -> {
+                        v.animate().scaleX(1f).scaleY(1f).setDuration(100).start();
+                    })
+                    .start();
+            saveAndShowConfirmation();
+        });
+
+        expandButton.setOnClickListener(v -> openExpandedEdit());
+    }
+
+    private void saveAndShowConfirmation() {
+        String text = entryInput.getText().toString().trim();
+
+        if (text.isEmpty()) {
+            ZenToast.show(this, "Tenta escrever algo primeiro", Gravity.BOTTOM, false);
+            return;
+        }
+
+        boolean isFirstEntry = !hadEntryToday;
+
+        CharSequence formattedText = entryInput.getText();
+        String formatting = TextFormattingSerializer.serializeFormatting(formattedText);
+
+        repo.saveOrUpdateTodayEntry(text, formatting, task -> {
+            runOnUiThread(() -> {
+                if (isFirstEntry) {
+                    repo.calculateStreak(streak -> {
+                        runOnUiThread(() -> {
+                            ZenToast.showStreakIncrease(this, streak);
+                        });
+                    });
+                } else {
+                    ZenToast.show(this, "Guardado", Gravity.BOTTOM, false);
+                }
+                loadTodayEntry();
+            });
+        });
+    }
+
+    private void openExpandedEdit() {
+        // Save current state first
+        saveCurrentEntry();
+
+        Intent intent = new Intent(this, ExpandedEditActivity.class);
+        intent.putExtra("text", entryInput.getText().toString());
+
+        CharSequence formattedText = entryInput.getText();
+        String formatting = TextFormattingSerializer.serializeFormatting(formattedText);
+        intent.putExtra("formatting", formatting);
+
+        startActivityForResult(intent, REQUEST_EXPANDED_EDIT);
+        overridePendingTransition(0, 0);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_EXPANDED_EDIT && resultCode == RESULT_OK && data != null) {
+            String editedText = data.getStringExtra("edited_text");
+            String formatting = data.getStringExtra("formatting");
+
+            if (editedText != null) {
+                // Apply text with formatting
+                if (formatting != null && !formatting.isEmpty()) {
+                    android.text.SpannableString formatted =
+                            TextFormattingSerializer.deserializeFormatting(editedText, formatting);
+                    entryInput.setText(formatted);
+                } else {
+                    entryInput.setText(editedText);
+                }
+
+                // Save immediately
+                saveCurrentEntry();
+            }
+        }
     }
 
     private void setupBottomNavigation() {
@@ -139,40 +407,29 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void saveEntry() {
-        String text = entryInput.getText().toString().trim();
-
-        if (text.isEmpty()) {
-            Toast.makeText(this, "Escreve algo primeiro", Toast.LENGTH_SHORT).show();
-            return;
+    private String capitalize(String text) {
+        if (text == null || text.isEmpty()) {
+            return text;
         }
-
-        repo.addOrUpdateEntry(System.currentTimeMillis(), text);
-
-        if (todaysEntry == null) {
-            ZenToast.showStreakIncrease(this, repo.calculateStreak());
-        }
-
-        Toast.makeText(this, "Guardado", Toast.LENGTH_SHORT).show();
-
-        loadTodayEntry();
+        return text.substring(0, 1).toUpperCase() + text.substring(1);
     }
 
-
-    private void showDeleteConfirmation() {
-        new AlertDialog.Builder(this)
-                .setTitle("Eliminar entrada")
-                .setMessage("Tens a certeza que queres eliminar a entrada de hoje?")
-                .setPositiveButton("Eliminar", (dialog, which) -> deleteEntry())
-                .setNegativeButton("Cancelar", null)
-                .show();
-    }
-
-    private void deleteEntry() {
-        if (todaysEntry != null) {
-            repo.deleteEntry(todaysEntry);
-            loadTodayEntry();
-            Toast.makeText(this, "Entrada eliminada", Toast.LENGTH_SHORT).show();
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            View v = getCurrentFocus();
+            if (v instanceof EditText) {
+                Rect outRect = new Rect();
+                v.getGlobalVisibleRect(outRect);
+                if (!outRect.contains((int)event.getRawX(), (int)event.getRawY())) {
+                    v.clearFocus();
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    }
+                }
+            }
         }
+        return super.dispatchTouchEvent(event);
     }
 }

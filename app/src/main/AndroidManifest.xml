@@ -2,8 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.afonso.fiveminutediary">
 
-    <!-- Permission for vibration -->
+    <!-- Permissions -->
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -13,9 +15,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!-- Main Activity -->
+        <!-- ===== AUTH ACTIVITIES ===== -->
+
+        <!-- Login Activity - LAUNCHER (primeira tela) -->
         <activity
-            android:name=".viewmodel.MainActivity"
+            android:name=".auth.LoginActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize">
@@ -24,6 +28,30 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Register Activity -->
+        <activity
+            android:name=".auth.RegisterActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            android:parentActivityName=".auth.LoginActivity" />
+
+        <!-- Email Verification Activity -->
+        <activity
+            android:name=".auth.EmailVerificationActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".auth.LoginActivity" />
+
+        <!-- ===== MAIN APP ACTIVITIES ===== -->
+
+        <!-- Main Activity (requer autenticação) -->
+        <activity
+            android:name=".viewmodel.MainActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- List Activity -->
         <activity
@@ -46,6 +74,12 @@
             android:screenOrientation="portrait"
             android:parentActivityName=".viewmodel.MainActivity" />
 
+        <!-- Profile Ativity -->
+        <activity
+            android:name=".viewmodel.ExpandedEditActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- list_header_gradient_short.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Solid gradient background (no fade) -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="135"
+                android:startColor="#6366F1"
+                android:endColor="#8B5CF6"
+                android:type="linear" />
+        </shape>
+    </item>
+
+    <!-- Fade out overlay at bottom only -->
+    <item android:top="85dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:startColor="#008B5CF6"
+                android:endColor="#FFF"
+                android:type="linear" />
+        </shape>
+    </item>
+</layer-list>
