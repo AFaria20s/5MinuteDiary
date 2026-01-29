@@ -14,6 +14,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "260731883146-0kjvk9si9glnftl7q90r0cebaiuvigh0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.afonso.fiveminutediary",
+            "certificate_hash": "9a7a591adb8bc8ade59571e24d4dc80e631548a9"
+          }
+        },
+        {
+          "client_id": "260731883146-1angb8s3mpqu7onko4a6lut92ae6rs8s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.afonso.fiveminutediary",
+            "certificate_hash": "1771e9b1c245989526197f5c16599035dc7c554f"
+          }
+        },
+        {
           "client_id": "260731883146-85vvosskh2v5i99cc0ov6hs33opqsguc.apps.googleusercontent.com",
           "client_type": 3
         }
