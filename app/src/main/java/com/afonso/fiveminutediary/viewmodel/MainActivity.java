@@ -60,27 +60,15 @@ public class MainActivity extends AppCompatActivity {
     private Handler autoSaveHandler;
     private Runnable autoSaveRunnable;
 
-    private String[] motivationalTexts = {
-            "Respira e escreve",
-            "O teu momento do dia",
-            "5 minutos para ti",
-            "Escreve livremente",
-            "Os teus pensamentos",
-            "Um momento de calma"
-    };
-
-    private String[] dailyQuotes = {
-            "Escrever é descobrir o que pensamos",
-            "As palavras têm poder",
-            "Cada dia é uma nova página",
-            "A escrita cura",
-            "Os pensamentos ganham vida ao serem escritos",
-            "Um diário é um amigo silencioso"
-    };
+    private String[] motivationalTexts;
+    private String[] dailyQuotes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Default locale = English
+        Locale.setDefault(new Locale("en"));
 
         // Check authentication
         if (!checkAuthentication()) {
@@ -91,6 +79,9 @@ public class MainActivity extends AppCompatActivity {
 
         repo = DataRepository.getInstance(this);
         autoSaveHandler = new Handler(Looper.getMainLooper());
+
+        motivationalTexts = getResources().getStringArray(R.array.motivational_texts);
+        dailyQuotes = getResources().getStringArray(R.array.daily_quotes);
 
         initViews();
         loadTodayEntry();
@@ -158,13 +149,13 @@ public class MainActivity extends AppCompatActivity {
         todayCard = findViewById(R.id.todayCard);
         expandButton = findViewById(R.id.expandButton);
 
-        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", new Locale("pt", "PT"));
-        SimpleDateFormat dayOfMonthFormat = new SimpleDateFormat("d", new Locale("pt", "PT"));
-        SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM", new Locale("pt", "PT"));
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
+        SimpleDateFormat dayOfMonthFormat = new SimpleDateFormat("d", Locale.getDefault());
+        SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM", Locale.getDefault());
 
         Date now = new Date();
         dayOfWeek.setText(capitalize(dayFormat.format(now)));
-        dateText.setText(dayOfMonthFormat.format(now) + " de " + capitalize(monthFormat.format(now)));
+        dateText.setText(dayOfMonthFormat.format(now) + " " + capitalize(monthFormat.format(now)));
 
         entryInput.addTextChangedListener(new TextWatcher() {
             @Override
@@ -241,11 +232,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateWordCount(String text) {
         if (text.trim().isEmpty()) {
-            wordCounter.setText("0 palavras");
+            wordCounter.setText(R.string.word_counter_zero);
             wordProgressBar.setProgress(0);
         } else {
             int words = text.trim().split("\\s+").length;
-            wordCounter.setText(words + (words == 1 ? " palavra" : " palavras"));
+            wordCounter.setText(getResources().getQuantityString(R.plurals.word_count, words, words));
             int progress = Math.min((words * 100) / 50, 100);
             wordProgressBar.setProgress(progress);
         }
