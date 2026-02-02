@@ -111,6 +111,11 @@ public class ExpandedEditActivity extends BaseActivity {
     }
 
     @Override
+    protected int getNavigationMenuItemId() {
+        return 0;
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         saveToFirebase();

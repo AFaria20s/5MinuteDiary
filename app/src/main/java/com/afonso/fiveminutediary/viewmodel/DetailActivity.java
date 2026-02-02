@@ -60,6 +60,11 @@ public class DetailActivity extends BaseActivity {
         setupListeners();
     }
 
+    @Override
+    protected int getNavigationMenuItemId() {
+        return 0;
+    }
+
     private void initViews() {
         headerImage = findViewById(R.id.headerImage);
         detailDate = findViewById(R.id.detailDate);
