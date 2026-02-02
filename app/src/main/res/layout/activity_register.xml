@@ -33,14 +33,14 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_back"
                 android:tint="#6B7280"
-                android:contentDescription="Voltar"
+                android:contentDescription="@string/back_desc"
                 android:layout_marginBottom="24dp" />
 
             <!-- Logo/App Name -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Criar Conta"
+                android:text="@string/create_account"
                 android:textSize="32sp"
                 android:textStyle="bold"
                 android:textColor="#1F2937"
@@ -50,7 +50,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Começa a tua jornada de escrita"
+                android:text="@string/start_your_journey"
                 android:textSize="16sp"
                 android:textColor="#6B7280"
                 android:fontFamily="sans-serif-light"
@@ -75,7 +75,7 @@
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Nome"
+                        android:hint="@string/name_label"
                         app:boxBackgroundMode="outline"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
@@ -97,7 +97,7 @@
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Email"
+                        android:hint="@string/email_label"
                         app:boxBackgroundMode="outline"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
@@ -119,7 +119,7 @@
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Password (mín. 6 caracteres)"
+                        android:hint="@string/password_min_label"
                         app:boxBackgroundMode="outline"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
@@ -142,7 +142,7 @@
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Confirmar Password"
+                        android:hint="@string/confirm_password_label"
                         app:boxBackgroundMode="outline"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
@@ -166,7 +166,7 @@
                         android:id="@+id/registerButton"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
-                        android:text="Criar Conta"
+                        android:text="@string/register_button"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textAllCaps="false"
@@ -192,7 +192,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="ou"
+                            android:text="@string/or_label"
                             android:textSize="14sp"
                             android:textColor="#9CA3AF"
                             android:paddingStart="16dp"
@@ -211,7 +211,7 @@
                         android:id="@+id/googleSignInButton"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
-                        android:text="Continuar com Google"
+                        android:text="@string/continue_google"
                         android:textSize="16sp"
                         android:textAllCaps="false"
                         android:textColor="#1F2937"
@@ -236,7 +236,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Já tens conta? "
+                    android:text="@string/have_account"
                     android:textSize="14sp"
                     android:textColor="#6B7280" />
 
@@ -244,7 +244,7 @@
                     android:id="@+id/loginText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Entrar"
+                    android:text="@string/login_link"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:textColor="#6366F1"

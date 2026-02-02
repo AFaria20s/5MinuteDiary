@@ -27,7 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:contentDescription="Imagem do diário"
+                android:contentDescription="@string/diary_image_desc"
                 app:layout_collapseMode="parallax" />
 
             <!-- Gradient Overlay -->
@@ -52,7 +52,7 @@
                     android:background="@drawable/circle_button_background"
                     android:src="@drawable/ic_back"
                     android:tint="@android:color/white"
-                    android:contentDescription="Voltar" />
+                    android:contentDescription="@string/back_desc" />
 
                 <View
                     android:layout_width="0dp"
@@ -67,7 +67,7 @@
                     android:background="@drawable/circle_button_background"
                     android:src="@android:drawable/ic_menu_gallery"
                     android:tint="@android:color/white"
-                    android:contentDescription="Mudar imagem" />
+                    android:contentDescription="@string/change_image_desc" />
 
                 <ImageButton
                     android:id="@+id/deleteDetailButton"
@@ -76,7 +76,7 @@
                     android:background="@drawable/circle_button_background"
                     android:src="@drawable/ic_delete"
                     android:tint="@android:color/white"
-                    android:contentDescription="Eliminar" />
+                    android:contentDescription="@string/delete_desc" />
 
             </LinearLayout>
 
@@ -101,7 +101,7 @@
                 android:id="@+id/detailDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Segunda, 1 de Janeiro de 2024"
+                android:text="@string/detail_date_example"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="#6366F1"
@@ -112,7 +112,7 @@
                 android:id="@+id/wordCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="150 palavras"
+                android:text="@string/preview_text_default"
                 android:textSize="12sp"
                 android:textColor="#9CA3AF"
                 android:layout_marginBottom="24dp" />
@@ -130,7 +130,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="24dp"
-                    android:text="Conteúdo do diário..."
+                    android:text="@string/detail_content_example"
                     android:textSize="16sp"
                     android:textColor="#1F2937"
                     android:lineSpacingExtra="6dp"

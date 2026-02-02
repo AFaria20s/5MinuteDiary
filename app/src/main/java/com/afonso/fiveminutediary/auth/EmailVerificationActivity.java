@@ -81,7 +81,7 @@ public class EmailVerificationActivity extends AppCompatActivity {
 
     private void displayEmail() {
         if (currentUser != null && currentUser.getEmail() != null) {
-            emailText.setText("Enviámos um link de verificação para\n" + currentUser.getEmail());
+            emailText.setText(String.format(getString(R.string.verification_email_sent), currentUser.getEmail()));
         }
     }
 
@@ -98,11 +98,11 @@ public class EmailVerificationActivity extends AppCompatActivity {
 
                         if (task.isSuccessful()) {
                             Toast.makeText(EmailVerificationActivity.this,
-                                    "Email reenviado!",
+                                    getString(R.string.email_resent),
                                     Toast.LENGTH_SHORT).show();
                         } else {
                             String errorMessage = task.getException() != null ?
-                                    task.getException().getMessage() : "Erro ao reenviar email";
+                                    task.getException().getMessage() : getString(R.string.password_reset_error);
                             Toast.makeText(EmailVerificationActivity.this,
                                     errorMessage,
                                     Toast.LENGTH_SHORT).show();
@@ -126,17 +126,17 @@ public class EmailVerificationActivity extends AppCompatActivity {
 
                     if (currentUser != null && currentUser.isEmailVerified()) {
                         Toast.makeText(EmailVerificationActivity.this,
-                                "Email verificado com sucesso!",
+                                getString(R.string.email_verified_success),
                                 Toast.LENGTH_SHORT).show();
                         navigateToMain();
                     } else {
                         Toast.makeText(EmailVerificationActivity.this,
-                                "Email ainda não verificado. Por favor verifica a tua caixa de entrada.",
+                                getString(R.string.email_not_verified),
                                 Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(EmailVerificationActivity.this,
-                            "Erro ao verificar. Tenta novamente.",
+                            getString(R.string.verification_error),
                             Toast.LENGTH_SHORT).show();
                 }
             }
@@ -162,14 +162,13 @@ public class EmailVerificationActivity extends AppCompatActivity {
 
                             if (currentUser != null && currentUser.isEmailVerified()) {
                                 Toast.makeText(EmailVerificationActivity.this,
-                                        "Email verificado!",
+                                        getString(R.string.email_verified),
                                         Toast.LENGTH_SHORT).show();
                                 navigateToMain();
                                 return;
                             }
                         }
 
-                        // CORREÇÃO: Usar verificationCheckRunnable em vez de this
                         // Check again in 5 seconds
                         if (verificationCheckHandler != null && verificationCheckRunnable != null) {
                             verificationCheckHandler.postDelayed(verificationCheckRunnable, 5000);

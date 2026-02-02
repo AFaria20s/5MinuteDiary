@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // Default locale = English
-        Locale.setDefault(new Locale("en"));
+        Locale.setDefault(Locale.ENGLISH);
 
         // Check authentication
         if (!checkAuthentication()) {
@@ -149,9 +149,10 @@ public class MainActivity extends AppCompatActivity {
         todayCard = findViewById(R.id.todayCard);
         expandButton = findViewById(R.id.expandButton);
 
-        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
-        SimpleDateFormat dayOfMonthFormat = new SimpleDateFormat("d", Locale.getDefault());
-        SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM", Locale.getDefault());
+        // Use English locale for date formatting
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.ENGLISH);
+        SimpleDateFormat dayOfMonthFormat = new SimpleDateFormat("d", Locale.ENGLISH);
+        SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM", Locale.ENGLISH);
 
         Date now = new Date();
         dayOfWeek.setText(capitalize(dayFormat.format(now)));
@@ -215,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
         timeRunnable = new Runnable() {
             @Override
             public void run() {
-                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
                 currentTime.setText(timeFormat.format(new Date()));
                 timeHandler.postDelayed(this, 1000);
             }
@@ -243,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadTodayEntry() {
-        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
                 .format(new Date());
 
         repo.getEntryForDay(today, entry -> {
@@ -308,7 +309,7 @@ public class MainActivity extends AppCompatActivity {
         String text = entryInput.getText().toString().trim();
 
         if (text.isEmpty()) {
-            ZenToast.show(this, "Tenta escrever algo primeiro", Gravity.BOTTOM, false);
+            ZenToast.show(this, getString(R.string.try_writing_something), Gravity.BOTTOM, false);
             return;
         }
 
@@ -326,7 +327,7 @@ public class MainActivity extends AppCompatActivity {
                         });
                     });
                 } else {
-                    ZenToast.show(this, "Guardado", Gravity.BOTTOM, false);
+                    ZenToast.show(this, getString(R.string.saved_toast), Gravity.BOTTOM, false);
                 }
                 loadTodayEntry();
             });

@@ -26,7 +26,7 @@ public class ListActivity extends AppCompatActivity implements DiaryAdapter.OnEn
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // VERIFICAR AUTENTICAÇÃO
+        // Check authentication
         checkAuthentication();
 
         setContentView(R.layout.activity_list);
@@ -42,7 +42,7 @@ public class ListActivity extends AppCompatActivity implements DiaryAdapter.OnEn
     protected void onResume() {
         super.onResume();
 
-        // Iniciar listener em tempo real
+        // Start realtime listener
         startRealtimeUpdates();
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
@@ -53,12 +53,12 @@ public class ListActivity extends AppCompatActivity implements DiaryAdapter.OnEn
     protected void onPause() {
         super.onPause();
 
-        // Parar listener para economizar recursos
+        // Stop listener to save resources
         repo.stopEntriesListener();
     }
 
     /**
-     * Verifica se o utilizador está autenticado
+     * Check if user is authenticated
      */
     private void checkAuthentication() {
         com.google.firebase.auth.FirebaseAuth auth = com.google.firebase.auth.FirebaseAuth.getInstance();
@@ -106,7 +106,7 @@ public class ListActivity extends AppCompatActivity implements DiaryAdapter.OnEn
     }
 
     /**
-     * Iniciar updates em tempo real
+     * Start realtime updates
      */
     private void startRealtimeUpdates() {
         repo.startEntriesListener(entries -> {
@@ -117,7 +117,7 @@ public class ListActivity extends AppCompatActivity implements DiaryAdapter.OnEn
     }
 
     /**
-     * Carregar entries (inicial)
+     * Load entries (initial)
      */
     private void loadEntries() {
         repo.getEntries(entries -> {
@@ -128,7 +128,7 @@ public class ListActivity extends AppCompatActivity implements DiaryAdapter.OnEn
     }
 
     /**
-     * Atualizar UI com entries
+     * Update UI with entries
      */
     private void updateUI(java.util.List<DiaryEntry> entries) {
         if (entries.isEmpty()) {
@@ -152,7 +152,9 @@ public class ListActivity extends AppCompatActivity implements DiaryAdapter.OnEn
     public void onDeleteClick(DiaryEntry entry) {
         repo.deleteEntry(entry, task -> {
             runOnUiThread(() -> {
-                android.widget.Toast.makeText(this, "Entrada eliminada", android.widget.Toast.LENGTH_SHORT).show();
+                android.widget.Toast.makeText(this,
+                        getString(R.string.entry_deleted_toast),
+                        android.widget.Toast.LENGTH_SHORT).show();
             });
         });
     }

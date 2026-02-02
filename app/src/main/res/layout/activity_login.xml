@@ -28,7 +28,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="5 Minute Diary"
+                android:text="@string/app_title_login"
                 android:textSize="32sp"
                 android:textStyle="bold"
                 android:textColor="#1F2937"
@@ -39,7 +39,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Bem-vindo de volta"
+                android:text="@string/welcome_back"
                 android:textSize="16sp"
                 android:textColor="#6B7280"
                 android:fontFamily="sans-serif-light"
@@ -63,7 +63,7 @@
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Email"
+                        android:hint="@string/email_label"
                         app:boxBackgroundMode="outline"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
@@ -85,7 +85,7 @@
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Password"
+                        android:hint="@string/password_label"
                         app:boxBackgroundMode="outline"
                         app:boxCornerRadiusTopStart="12dp"
                         app:boxCornerRadiusTopEnd="12dp"
@@ -109,7 +109,7 @@
                         android:id="@+id/forgotPasswordText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Esqueceste-te da password?"
+                        android:text="@string/forgot_password"
                         android:textSize="14sp"
                         android:textColor="#6366F1"
                         android:layout_gravity="end"
@@ -121,7 +121,7 @@
                         android:id="@+id/loginButton"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
-                        android:text="Entrar"
+                        android:text="@string/login_button"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textAllCaps="false"
@@ -147,7 +147,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="ou"
+                            android:text="@string/or_label"
                             android:textSize="14sp"
                             android:textColor="#9CA3AF"
                             android:paddingStart="16dp"
@@ -166,7 +166,7 @@
                         android:id="@+id/googleSignInButton"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
-                        android:text="Continuar com Google"
+                        android:text="@string/continue_google"
                         android:textSize="16sp"
                         android:textAllCaps="false"
                         android:textColor="#1F2937"
@@ -191,7 +191,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Não tens conta? "
+                    android:text="@string/no_account"
                     android:textSize="14sp"
                     android:textColor="#6B7280" />
 
@@ -199,7 +199,7 @@
                     android:id="@+id/signUpText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Regista-te"
+                    android:text="@string/sign_up_link"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:textColor="#6366F1"

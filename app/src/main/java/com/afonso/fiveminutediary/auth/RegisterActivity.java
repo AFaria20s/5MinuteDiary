@@ -99,37 +99,37 @@ public class RegisterActivity extends AppCompatActivity {
 
         // Validation
         if (TextUtils.isEmpty(name)) {
-            nameInput.setError("Nome é obrigatório");
+            nameInput.setError(getString(R.string.name_required));
             nameInput.requestFocus();
             return;
         }
 
         if (TextUtils.isEmpty(email)) {
-            emailInput.setError("Email é obrigatório");
+            emailInput.setError(getString(R.string.email_required));
             emailInput.requestFocus();
             return;
         }
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            emailInput.setError("Email inválido");
+            emailInput.setError(getString(R.string.email_invalid));
             emailInput.requestFocus();
             return;
         }
 
         if (TextUtils.isEmpty(password)) {
-            passwordInput.setError("Password é obrigatória");
+            passwordInput.setError(getString(R.string.password_required));
             passwordInput.requestFocus();
             return;
         }
 
         if (password.length() < 6) {
-            passwordInput.setError("Password deve ter pelo menos 6 caracteres");
+            passwordInput.setError(getString(R.string.password_min_length));
             passwordInput.requestFocus();
             return;
         }
 
         if (!password.equals(confirmPassword)) {
-            confirmPasswordInput.setError("As passwords não coincidem");
+            confirmPasswordInput.setError(getString(R.string.passwords_no_match));
             confirmPasswordInput.requestFocus();
             return;
         }
@@ -166,7 +166,7 @@ public class RegisterActivity extends AppCompatActivity {
                         } else {
                             setLoading(false);
                             String errorMessage = task.getException() != null ?
-                                    task.getException().getMessage() : "Erro ao criar conta";
+                                    task.getException().getMessage() : getString(R.string.error_create_account);
                             Toast.makeText(RegisterActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                         }
                     }
@@ -182,12 +182,12 @@ public class RegisterActivity extends AppCompatActivity {
 
                         if (task.isSuccessful()) {
                             Toast.makeText(RegisterActivity.this,
-                                    "Conta criada! Verifica o teu email.",
+                                    getString(R.string.account_created),
                                     Toast.LENGTH_LONG).show();
                             navigateToEmailVerification();
                         } else {
                             Toast.makeText(RegisterActivity.this,
-                                    "Erro ao enviar email de verificação",
+                                    getString(R.string.verification_email_error),
                                     Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -227,7 +227,9 @@ public class RegisterActivity extends AppCompatActivity {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account.getIdToken());
             } catch (ApiException e) {
-                Toast.makeText(this, "Google sign in falhou: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,
+                        String.format(getString(R.string.google_signin_failed), e.getMessage()),
+                        Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -254,12 +256,12 @@ public class RegisterActivity extends AppCompatActivity {
                                             user.getEmail()
                                     );
                                 }
-                                Toast.makeText(RegisterActivity.this, "Bem-vindo!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(RegisterActivity.this, getString(R.string.welcome), Toast.LENGTH_SHORT).show();
                                 navigateToMain();
                             }
                         } else {
                             String errorMessage = task.getException() != null ?
-                                    task.getException().getMessage() : "Autenticação falhou";
+                                    task.getException().getMessage() : getString(R.string.auth_failed);
                             Toast.makeText(RegisterActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
                         }
                     }

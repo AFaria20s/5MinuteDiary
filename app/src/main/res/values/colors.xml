@@ -33,8 +33,8 @@
     <color name="overlay_light">#40FFFFFF</color>
 
     <!-- Bottom Navigation Colors -->
-    <color name="bottom_nav_selected">#6366F1</color>
-    <color name="bottom_nav_unselected">#9CA3AF</color>
+    <color name="bottom_nav_item">#9CA3AF</color>
+    <color name="bottom_nav_indicator_bg">#1A1A2E</color>
 
     <!-- Chip Background (para os chips de modo) -->
     <color name="chip_background_default">#F3F4F6</color>

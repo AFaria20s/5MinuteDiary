@@ -14,7 +14,7 @@
         android:id="@+id/monthYearText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Janeiro 2025"
+        android:text="@string/month_header_example"
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="#1F2937" />
