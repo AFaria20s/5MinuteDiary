@@ -43,7 +43,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Olá,"
+                        android:text="@string/hello"
                         android:textSize="16sp"
                         android:textColor="#E0E7FF"
                         android:alpha="0.9"
@@ -54,7 +54,7 @@
                         android:id="@+id/nameInput"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:hint="O teu nome"
+                        android:hint="@string/hint_your_name"
                         android:textSize="32sp"
                         android:textStyle="bold"
                         android:textColor="#FFFFFF"
@@ -69,7 +69,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="A tua jornada de escrita"
+                        android:text="@string/your_writing_journey"
                         android:textSize="14sp"
                         android:textColor="#E0E7FF"
                         android:alpha="0.8" />
@@ -78,7 +78,7 @@
                         android:id="@+id/journeyDaysText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Há 1 dia"
+                        android:text="@string/default_days_ago"
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:textColor="#FFFFFF"
@@ -99,7 +99,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="A tua escrita"
+                    android:text="@string/your_writing"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:textColor="#1F2937"
@@ -142,7 +142,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Entradas"
+                                android:text="@string/entries_label"
                                 android:textSize="13sp"
                                 android:textColor="#6B7280"
                                 android:layout_marginTop="4dp" />
@@ -180,7 +180,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Streak"
+                                android:text="@string/streak_label"
                                 android:textSize="13sp"
                                 android:textColor="#6B7280"
                                 android:layout_marginTop="4dp" />
@@ -219,7 +219,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Descobre padrões na tua escrita"
+                            android:text="@string/premium_title"
                             android:textSize="18sp"
                             android:textStyle="bold"
                             android:textColor="#1F2937"
@@ -228,7 +228,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Análises detalhadas, gráficos e muito mais"
+                            android:text="@string/premium_subtitle"
                             android:textSize="14sp"
                             android:textColor="#6B7280"
                             android:lineSpacingExtra="4dp"
@@ -256,7 +256,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Histórico detalhado de streak"
+                                    android:text="@string/premium_feature_1"
                                     android:textSize="13sp"
                                     android:textColor="#6B7280" />
 
@@ -278,7 +278,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Gráficos de produtividade"
+                                    android:text="@string/premium_feature_2"
                                     android:textSize="13sp"
                                     android:textColor="#6B7280" />
 
@@ -299,7 +299,7 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Análise de padrões de escrita"
+                                    android:text="@string/premium_feature_3"
                                     android:textSize="13sp"
                                     android:textColor="#6B7280" />
 
@@ -317,7 +317,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Definições"
+                    android:text="@string/settings_label"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:textColor="#1F2937"
@@ -343,7 +343,7 @@
                             android:id="@+id/logoutButton"
                             android:layout_width="match_parent"
                             android:layout_height="56dp"
-                            android:text="Terminar Sessão"
+                            android:text="@string/logout_text"
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:backgroundTint="#6366F1"
@@ -359,7 +359,7 @@
                             android:id="@+id/deleteAccountButton"
                             android:layout_width="match_parent"
                             android:layout_height="56dp"
-                            android:text="Eliminar Conta"
+                            android:text="@string/delete_account_button"
                             android:textSize="16sp"
                             android:textStyle="bold"
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -367,7 +367,7 @@
                             app:strokeColor="@color/error"
                             app:strokeWidth="2dp"
                             app:cornerRadius="12dp"
-                            app:icon="@android:drawable/ic_menu_delete"
+                            app:icon="@drawable/delete"
                             app:iconTint="@color/error"
                             app:iconGravity="textStart"
                             app:iconPadding="8dp" />
@@ -393,7 +393,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Sobre"
+                            android:text="@string/about_label"
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:textColor="#1F2937"
@@ -402,7 +402,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="5 Minute Diary"
+                            android:text="@string/app_name"
                             android:textSize="14sp"
                             android:textColor="#6B7280"
                             android:layout_marginBottom="4dp" />
@@ -410,7 +410,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Versão 1.0.0"
+                            android:text="@string/app_version"
                             android:textSize="13sp"
                             android:textColor="#9CA3AF" />
 
@@ -429,12 +429,13 @@
         android:id="@+id/bottomNavigation"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
+        android:background="@color/background"
         app:elevation="8dp"
-        app:itemIconTint="@color/bottom_nav_color"
-        app:itemTextColor="@color/bottom_nav_color"
-        app:labelVisibilityMode="labeled"
+        app:itemIconTint="@color/bottom_nav_item"
+        app:itemTextColor="@color/bottom_nav_item"
         app:menu="@menu/bottom_nav_menu"
+        app:labelVisibilityMode="unlabeled"
+        app:itemActiveIndicatorStyle="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

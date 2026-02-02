@@ -1,5 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?><!-- activity_email_verification.xml -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<!-- activity_email_verification.xml -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -29,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="Verifica o teu email"
+            android:text="@string/verify_your_email"
             android:textColor="#1F2937"
             android:textSize="28sp"
             android:textStyle="bold" />
@@ -42,7 +44,7 @@
             android:layout_marginBottom="32dp"
             android:gravity="center"
             android:lineSpacingExtra="4dp"
-            android:text="Enviámos um link de verificação para\nexample@email.com"
+            android:text="@string/example_email"
             android:textColor="#6B7280"
             android:textSize="16sp" />
 
@@ -53,7 +55,7 @@
             android:layout_height="56dp"
             android:layout_marginBottom="16dp"
             android:backgroundTint="#6366F1"
-            android:text="Reenviar email"
+            android:text="@string/resend_email_button"
             android:textAllCaps="false"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -66,7 +68,7 @@
             android:layout_height="56dp"
             android:layout_marginBottom="16dp"
             android:backgroundTint="#FFFFFF"
-            android:text="Já verifiquei"
+            android:text="@string/already_verified_button"
             android:textAllCaps="false"
             android:textColor="#6366F1"
             android:textSize="16sp"
@@ -81,7 +83,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:padding="12dp"
-            android:text="Sair"
+            android:text="@string/logout_text"
             android:textColor="#9CA3AF"
             android:textSize="14sp" />
 

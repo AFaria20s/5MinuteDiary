@@ -50,7 +50,7 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // VERIFICAR AUTENTICAÇÃO
+        // Check authentication
         checkAuthentication();
 
         setContentView(R.layout.activity_profile);
@@ -58,7 +58,7 @@ public class ProfileActivity extends AppCompatActivity {
         repo = DataRepository.getInstance(this);
         auth = FirebaseAuth.getInstance();
 
-        // Configure Google Sign In para logout
+        // Configure Google Sign In for logout
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -75,10 +75,10 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        // Iniciar listener em tempo real para profile
+        // Start realtime listener for profile
         startRealtimeProfileUpdates();
 
-        // Recarregar stats
+        // Reload stats
         loadProfileData();
 
         if (userProfile != null) {
@@ -94,7 +94,7 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
-        // Parar listener
+        // Stop listener
         repo.stopProfileListener();
 
         // Auto-save name
@@ -107,7 +107,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     /**
-     * Verifica se o utilizador está autenticado
+     * Check if user is authenticated
      */
     private void checkAuthentication() {
         auth = FirebaseAuth.getInstance();
@@ -139,14 +139,14 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     /**
-     * Iniciar updates em tempo real do perfil
+     * Start realtime updates for profile
      */
     private void startRealtimeProfileUpdates() {
         repo.startProfileListener(profile -> {
             runOnUiThread(() -> {
                 userProfile = profile;
                 if (userProfile != null && userProfile.getUserName() != null) {
-                    // Só atualizar se o campo não está focado
+                    // Only update if field is not focused
                     if (!nameInput.hasFocus()) {
                         nameInput.setText(userProfile.getUserName());
                     }
@@ -175,22 +175,21 @@ public class ProfileActivity extends AppCompatActivity {
                 System.currentTimeMillis() - userProfile.getFirstUseTimestamp()
         );
 
-        if (daysSinceFirstUse == 0) {
-            journeyDaysText.setText("Hoje");
-        } else if (daysSinceFirstUse == 1) {
-            journeyDaysText.setText("Há 1 dia");
-        } else {
-            journeyDaysText.setText("Há " + daysSinceFirstUse + " dias");
-        }
+        // Use proper plurals
+        journeyDaysText.setText(getResources().getQuantityString(
+                R.plurals.journey_days,
+                (int) daysSinceFirstUse,
+                (int) daysSinceFirstUse
+        ));
 
-        // Total entries (com cache)
+        // Total entries (with cache)
         repo.getEntryCount(count -> {
             runOnUiThread(() -> {
                 totalEntriesText.setText(String.valueOf(count));
             });
         });
 
-        // Streak (com cache)
+        // Streak (with cache)
         repo.calculateStreak(streak -> {
             runOnUiThread(() -> {
                 streakText.setText(String.valueOf(streak));
@@ -203,43 +202,43 @@ public class ProfileActivity extends AppCompatActivity {
         if (userProfile != null && !name.equals(userProfile.getUserName())) {
             userProfile.setUserName(name);
 
-            // Atualizar apenas o campo "userName" para eficiência
+            // Update only the "userName" field for efficiency
             repo.updateUserProfileField("userName", name, task -> {
-                // Opcional: mostrar feedback
+                // Optional: show feedback
             });
         }
     }
 
     private void setupPremiumCard() {
         premiumStatsCard.setOnClickListener(v -> {
-            Toast.makeText(this, "Funcionalidade premium - Em breve!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.premium_toast, Toast.LENGTH_SHORT).show();
         });
     }
 
     /**
-     * Mostrar diálogo de confirmação de logout
+     * Show logout confirmation dialog
      */
     private void showLogoutDialog() {
         new AlertDialog.Builder(this)
-                .setTitle("Terminar sessão")
-                .setMessage("Tens a certeza que queres sair?")
-                .setPositiveButton("Sair", (dialog, which) -> performLogout())
-                .setNegativeButton("Cancelar", null)
+                .setTitle(R.string.logout_title)
+                .setMessage(R.string.logout_message)
+                .setPositiveButton(R.string.yes, (dialog, which) -> performLogout())
+                .setNegativeButton(R.string.cancel_button, null)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
 
     /**
-     * Executar logout
+     * Perform logout
      */
     private void performLogout() {
-        // Limpar cache do repository
+        // Clear repository cache
         repo.clearCache();
 
         // Sign out from Firebase
         auth.signOut();
 
-        // Sign out from Google (se fez login com Google)
+        // Sign out from Google (if logged in with Google)
         googleSignInClient.signOut().addOnCompleteListener(this, task -> {
             // Navigate to login
             Intent intent = new Intent(this, com.afonso.fiveminutediary.auth.LoginActivity.class);
@@ -250,13 +249,13 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     /**
-     * Mostrar diálogo de confirmação de eliminação de conta
+     * Show account deletion confirmation dialog
      */
     private void showDeleteAccountDialog() {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) return;
 
-        // Verificar se é conta Google ou Email/Password
+        // Check if it's a Google account or Email/Password
         boolean isGoogleAccount = false;
         for (int i = 0; i < user.getProviderData().size(); i++) {
             if (user.getProviderData().get(i).getProviderId().equals("google.com")) {
@@ -266,47 +265,43 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         if (isGoogleAccount) {
-            // Para conta Google, não precisa de password
+            // For Google account, no password needed
             showDeleteConfirmationForGoogle();
         } else {
-            // Para conta Email/Password, pedir password
+            // For Email/Password account, ask for password
             showPasswordConfirmationDialog();
         }
     }
 
     /**
-     * Confirmação de eliminação para contas Google
+     * Deletion confirmation for Google accounts
      */
     private void showDeleteConfirmationForGoogle() {
         new AlertDialog.Builder(this)
-                .setTitle("Eliminar Conta")
-                .setMessage("Esta ação é PERMANENTE e IRREVERSÍVEL.\n\n" +
-                        "• Todas as tuas entradas serão eliminadas\n" +
-                        "• O teu perfil será apagado\n" +
-                        "• Não será possível recuperar os dados\n\n" +
-                        "Tens a certeza absoluta?")
-                .setPositiveButton("Sim, eliminar PERMANENTEMENTE", (dialog, which) -> {
+                .setTitle(R.string.delete_account_title)
+                .setMessage(R.string.delete_account_message_google)
+                .setPositiveButton(R.string.delete_account_confirm, (dialog, which) -> {
                     performAccountDeletion();
                 })
-                .setNegativeButton("Cancelar", null)
+                .setNegativeButton(R.string.cancel_button, null)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
 
     /**
-     * Diálogo de confirmação com password
+     * Password confirmation dialog
      */
     private void showPasswordConfirmationDialog() {
-        // Criar layout customizado para o diálogo
+        // Create custom layout for dialog
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_password_confirmation, null);
         EditText passwordInput = dialogView.findViewById(R.id.passwordConfirmInput);
 
         AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle("Eliminar Conta")
-                .setMessage("Para eliminar a tua conta, confirma a tua password.")
+                .setTitle(R.string.delete_account_title)
+                .setMessage(R.string.delete_account_password_prompt)
                 .setView(dialogView)
-                .setPositiveButton("Eliminar", null) // Null para controlar manualmente
-                .setNegativeButton("Cancelar", null)
+                .setPositiveButton(R.string.delete_account_button, null)
+                .setNegativeButton(R.string.cancel_button, null)
                 .create();
 
         dialog.setOnShowListener(dialogInterface -> {
@@ -315,16 +310,16 @@ public class ProfileActivity extends AppCompatActivity {
                 String password = passwordInput.getText().toString().trim();
 
                 if (TextUtils.isEmpty(password)) {
-                    passwordInput.setError("Password é obrigatória");
+                    passwordInput.setError(getString(R.string.password_required));
                     passwordInput.requestFocus();
                     return;
                 }
 
-                // Desabilitar botão durante verificação
+                // Disable button during verification
                 button.setEnabled(false);
                 passwordInput.setEnabled(false);
 
-                // Re-autenticar e eliminar
+                // Re-authenticate and delete
                 reauthenticateAndDelete(password, dialog);
             });
         });
@@ -333,35 +328,35 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     /**
-     * Re-autenticar utilizador e eliminar conta
+     * Re-authenticate user and delete account
      */
     private void reauthenticateAndDelete(String password, AlertDialog dialog) {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null || user.getEmail() == null) {
-            Toast.makeText(this, "Erro ao obter utilizador", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_getting_user, Toast.LENGTH_SHORT).show();
             dialog.dismiss();
             return;
         }
 
-        // Criar credencial com email e password
+        // Create credential with email and password
         AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), password);
 
-        // Re-autenticar
+        // Re-authenticate
         user.reauthenticate(credential)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            // Password correta, mostrar confirmação final
+                            // Password correct, show final confirmation
                             dialog.dismiss();
                             showFinalDeleteConfirmation();
                         } else {
-                            // Password incorreta
+                            // Password incorrect
                             dialog.dismiss();
                             new AlertDialog.Builder(ProfileActivity.this)
-                                    .setTitle("Password incorreta")
-                                    .setMessage("A password que inseriste está incorreta. Tenta novamente.")
-                                    .setPositiveButton("OK", null)
+                                    .setTitle(R.string.password_incorrect_title)
+                                    .setMessage(R.string.password_incorrect_message)
+                                    .setPositiveButton(R.string.ok, null)
                                     .show();
                         }
                     }
@@ -369,34 +364,30 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     /**
-     * Confirmação final antes de eliminar
+     * Final confirmation before deletion
      */
     private void showFinalDeleteConfirmation() {
         new AlertDialog.Builder(this)
-                .setTitle("ÚLTIMA CONFIRMAÇÃO")
-                .setMessage("Tens a CERTEZA ABSOLUTA que queres eliminar a tua conta?\n\n" +
-                        "• Todas as entradas serão eliminadas\n" +
-                        "• O teu perfil será apagado\n" +
-                        "• Esta ação é IRREVERSÍVEL\n\n" +
-                        "Não será possível recuperar os dados.")
-                .setPositiveButton("SIM, ELIMINAR TUDO", (dialog, which) -> {
+                .setTitle(R.string.delete_account_final_title)
+                .setMessage(R.string.delete_account_final_message)
+                .setPositiveButton(R.string.delete_account_final_confirm, (dialog, which) -> {
                     performAccountDeletion();
                 })
-                .setNegativeButton("Não, voltar atrás", null)
+                .setNegativeButton(R.string.delete_account_final_cancel, null)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
 
     /**
-     * Executar eliminação da conta
+     * Perform account deletion
      */
     private void performAccountDeletion() {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) return;
 
         AlertDialog loadingDialog = new AlertDialog.Builder(this)
-                .setTitle("A eliminar conta...")
-                .setMessage("Por favor aguarda.")
+                .setTitle(R.string.delete_account_progress)
+                .setMessage(R.string.delete_account_wait)
                 .setCancelable(false)
                 .create();
         loadingDialog.show();
@@ -409,15 +400,15 @@ public class ProfileActivity extends AppCompatActivity {
                             loadingDialog.dismiss();
 
                             if (task.isSuccessful()) {
-                                // Limpar cache
+                                // Clear cache
                                 repo.clearCache();
 
-                                // Sign out do Google se necessário
+                                // Sign out from Google if necessary
                                 googleSignInClient.signOut();
 
-                                // Mostrar mensagem e voltar ao login
+                                // Show message and return to login
                                 Toast.makeText(ProfileActivity.this,
-                                        "Conta eliminada com sucesso",
+                                        R.string.delete_account_success,
                                         Toast.LENGTH_LONG).show();
 
                                 Intent intent = new Intent(ProfileActivity.this,
@@ -426,15 +417,14 @@ public class ProfileActivity extends AppCompatActivity {
                                 startActivity(intent);
                                 finish();
                             } else {
-                                // Erro ao eliminar conta
+                                // Error deleting account
                                 String errorMessage = task.getException() != null ?
-                                        task.getException().getMessage() : "Erro desconhecido";
+                                        task.getException().getMessage() : getString(R.string.unknown_error);
 
                                 new AlertDialog.Builder(ProfileActivity.this)
-                                        .setTitle("Erro ao eliminar conta")
-                                        .setMessage("Não foi possível eliminar a conta:\n\n" + errorMessage +
-                                                "\n\nPor favor tenta fazer logout e login novamente antes de eliminar.")
-                                        .setPositiveButton("OK", null)
+                                        .setTitle(R.string.delete_account_error_title)
+                                        .setMessage(String.format(getString(R.string.delete_account_error_message), errorMessage))
+                                        .setPositiveButton(R.string.ok, null)
                                         .show();
                             }
                         }

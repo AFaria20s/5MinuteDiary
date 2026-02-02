@@ -100,25 +100,25 @@ public class LoginActivity extends AppCompatActivity {
 
         // Validation
         if (TextUtils.isEmpty(email)) {
-            emailInput.setError("Email é obrigatório");
+            emailInput.setError(getString(R.string.email_required));
             emailInput.requestFocus();
             return;
         }
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            emailInput.setError("Email inválido");
+            emailInput.setError(getString(R.string.email_invalid));
             emailInput.requestFocus();
             return;
         }
 
         if (TextUtils.isEmpty(password)) {
-            passwordInput.setError("Password é obrigatória");
+            passwordInput.setError(getString(R.string.password_required));
             passwordInput.requestFocus();
             return;
         }
 
         if (password.length() < 6) {
-            passwordInput.setError("Password deve ter pelo menos 6 caracteres");
+            passwordInput.setError(getString(R.string.password_min_length));
             passwordInput.requestFocus();
             return;
         }
@@ -137,16 +137,16 @@ public class LoginActivity extends AppCompatActivity {
                             FirebaseUser user = auth.getCurrentUser();
                             if (user != null) {
                                 if (user.isEmailVerified()) {
-                                    Toast.makeText(LoginActivity.this, "Bem-vindo!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(LoginActivity.this, getString(R.string.welcome), Toast.LENGTH_SHORT).show();
                                     navigateToMain();
                                 } else {
-                                    Toast.makeText(LoginActivity.this, "Por favor verifica o teu email primeiro", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(LoginActivity.this, getString(R.string.verify_email_first), Toast.LENGTH_LONG).show();
                                     navigateToEmailVerification();
                                 }
                             }
                         } else {
                             String errorMessage = task.getException() != null ?
-                                    task.getException().getMessage() : "Erro ao fazer login";
+                                    task.getException().getMessage() : getString(R.string.login_error);
                             Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                         }
                     }
@@ -168,7 +168,9 @@ public class LoginActivity extends AppCompatActivity {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account.getIdToken());
             } catch (ApiException e) {
-                Toast.makeText(this, "Google sign in falhou: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,
+                        String.format(getString(R.string.google_signin_failed), e.getMessage()),
+                        Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -186,7 +188,7 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             FirebaseUser user = auth.getCurrentUser();
 
-                            // ✅ NOVO: Obter nome da conta Google
+                            // Save Google name to profile
                             if (user != null) {
                                 String displayName = user.getDisplayName();
                                 String email = user.getEmail();
@@ -194,15 +196,15 @@ public class LoginActivity extends AppCompatActivity {
                                 android.util.Log.d("LoginActivity", "Google name: " + displayName);
                                 android.util.Log.d("LoginActivity", "Google email: " + email);
 
-                                // Guardar o nome no perfil
+                                // Save the name to profile
                                 saveGoogleNameToProfile(displayName);
                             }
 
-                            Toast.makeText(LoginActivity.this, "Bem-vindo!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, getString(R.string.welcome), Toast.LENGTH_SHORT).show();
                             navigateToMain();
                         } else {
                             String errorMessage = task.getException() != null ?
-                                    task.getException().getMessage() : "Autenticação falhou";
+                                    task.getException().getMessage() : getString(R.string.auth_failed);
                             Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -210,7 +212,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * Guardar nome da conta Google no perfil do utilizador
+     * Save Google account name to user profile
      */
     private void saveGoogleNameToProfile(String displayName) {
         if (displayName == null || displayName.isEmpty()) {
@@ -221,7 +223,7 @@ public class LoginActivity extends AppCompatActivity {
                 com.afonso.fiveminutediary.data.DataRepository.getInstance(this);
 
         repo.getOrCreateUserProfile(profile -> {
-            // Só atualizar se o nome ainda estiver vazio
+            // Only update if name is still empty
             if (profile.getUserName() == null || profile.getUserName().isEmpty()) {
                 profile.setUserName(displayName);
                 repo.updateUserProfile(profile, task -> {
@@ -235,13 +237,13 @@ public class LoginActivity extends AppCompatActivity {
         String email = emailInput.getText().toString().trim();
 
         if (TextUtils.isEmpty(email)) {
-            emailInput.setError("Insere o teu email");
+            emailInput.setError(getString(R.string.enter_email));
             emailInput.requestFocus();
             return;
         }
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            emailInput.setError("Email inválido");
+            emailInput.setError(getString(R.string.email_invalid));
             emailInput.requestFocus();
             return;
         }
@@ -256,11 +258,11 @@ public class LoginActivity extends AppCompatActivity {
 
                         if (task.isSuccessful()) {
                             Toast.makeText(LoginActivity.this,
-                                    "Email de recuperação enviado para " + email,
+                                    String.format(getString(R.string.password_reset_sent), email),
                                     Toast.LENGTH_LONG).show();
                         } else {
                             String errorMessage = task.getException() != null ?
-                                    task.getException().getMessage() : "Erro ao enviar email";
+                                    task.getException().getMessage() : getString(R.string.password_reset_error);
                             Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                         }
                     }

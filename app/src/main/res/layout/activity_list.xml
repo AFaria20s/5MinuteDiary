@@ -36,7 +36,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Histórico"
+                    android:text="@string/history_title"
                     android:textSize="24sp"
                     android:textStyle="bold"
                     android:textColor="#FFFFFF" />
@@ -78,7 +78,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ainda não há entradas"
+                    android:text="@string/no_entries"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="#1F2937" />
@@ -86,7 +86,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Começa a escrever hoje"
+                    android:text="@string/start_writing_hint"
                     android:textSize="14sp"
                     android:textColor="#6B7280"
                     android:layout_marginTop="8dp" />
@@ -102,12 +102,13 @@
         android:id="@+id/bottomNavigation"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
+        android:background="@color/background"
         app:elevation="8dp"
-        app:itemIconTint="@color/bottom_nav_color"
-        app:itemTextColor="@color/bottom_nav_color"
-        app:labelVisibilityMode="labeled"
+        app:itemIconTint="@color/bottom_nav_item"
+        app:itemTextColor="@color/bottom_nav_item"
         app:menu="@menu/bottom_nav_menu"
+        app:labelVisibilityMode="unlabeled"
+        app:itemActiveIndicatorStyle="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

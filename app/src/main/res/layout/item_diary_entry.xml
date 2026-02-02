@@ -38,7 +38,7 @@
                     android:id="@+id/dayNumber"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="27"
+                    android:text="@string/item_day_example"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:textColor="#1F2937" />
@@ -47,7 +47,7 @@
                     android:id="@+id/monthShort"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Jan"
+                    android:text="@string/item_month_short_example"
                     android:textSize="11sp"
                     android:textColor="#6B7280"
                     android:layout_marginTop="2dp" />
@@ -69,7 +69,7 @@
                 android:id="@+id/previewText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Preview do texto..."
+                android:text="@string/item_preview_example"
                 android:textSize="15sp"
                 android:textColor="#1F2937"
                 android:maxLines="2"
@@ -80,7 +80,7 @@
                 android:id="@+id/metaText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="150 palavras"
+                android:text="@string/preview_text_default"
                 android:textSize="12sp"
                 android:textColor="#9CA3AF"
                 android:layout_marginTop="4dp" />
@@ -95,7 +95,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/delete"
             android:tint="#D1D5DB"
-            android:contentDescription="Eliminar" />
+            android:contentDescription="@string/delete_desc" />
 
     </LinearLayout>
 

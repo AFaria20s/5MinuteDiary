@@ -51,7 +51,7 @@ public class DiaryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         // Group entries by month/year
         String currentMonthYear = "";
-        SimpleDateFormat monthYearFormat = new SimpleDateFormat("MMMM yyyy", new Locale("pt", "PT"));
+        SimpleDateFormat monthYearFormat = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
 
         for (DiaryEntry entry : entries) {
             String entryMonthYear = monthYearFormat.format(new Date(entry.getTimestamp()));
@@ -143,7 +143,7 @@ public class DiaryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             dayNumber.setText(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
 
             // Month short (Jan, Fev, etc)
-            SimpleDateFormat monthFormat = new SimpleDateFormat("MMM", new Locale("pt", "PT"));
+            SimpleDateFormat monthFormat = new SimpleDateFormat("MMM", Locale.getDefault());
             monthShort.setText(monthFormat.format(new Date(entry.getTimestamp())));
 
             // Preview text (first 80 characters)

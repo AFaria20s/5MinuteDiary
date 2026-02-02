@@ -109,32 +109,32 @@ public class ZenToast {
      * Show streak celebration toast with enhanced animations
      */
     public static void showStreakIncrease(Context context, int newStreak) {
-        String message = getStreakMessage(newStreak);
+        String message = getStreakMessage(context, newStreak);
         show(context, message, Gravity.TOP, true);
     }
 
     /**
      * Get appropriate message for streak
      */
-    private static String getStreakMessage(int streak) {
+    private static String getStreakMessage(Context context, int streak) {
         if (streak <= 1) {
-            return "✨ Começaste a tua jornada!";
+            return context.getString(R.string.streak_toast_started);
         } else if (streak == 2) {
-            return "🌱 2 dias consecutivos!";
+            return context.getString(R.string.streak_toast_2_days);
         } else if (streak == 3) {
-            return "🔥 3 dias! O hábito está a criar-se";
+            return context.getString(R.string.streak_toast_3_days);
         } else if (streak == 7) {
-            return "⭐ Uma semana inteira! Incrível!";
+            return context.getString(R.string.streak_toast_week);
         } else if (streak == 14) {
-            return "🎯 2 semanas! Continua assim!";
+            return context.getString(R.string.streak_toast_2_weeks);
         } else if (streak == 30) {
-            return "🏆 Um mês completo! Inspirador!";
+            return context.getString(R.string.streak_toast_month);
         } else if (streak == 100) {
-            return "💎 100 dias! Lendário!";
+            return context.getString(R.string.streak_toast_100_days);
         } else if (streak % 10 == 0) {
-            return "🌟 " + streak + " dias! Extraordinário!";
+            return context.getString(R.string.streak_toast_milestone, streak);
         } else {
-            return "✓ " + streak + " dias seguidos";
+            return context.getString(R.string.streak_toast_continue, streak);
         }
     }
 

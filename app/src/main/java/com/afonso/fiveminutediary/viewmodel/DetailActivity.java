@@ -72,13 +72,16 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void loadData() {
-        SimpleDateFormat sdf = new SimpleDateFormat("EEEE, d 'de' MMMM 'de' yyyy", new Locale("pt", "PT"));
+        // Use English locale for date formatting
+        SimpleDateFormat sdf = new SimpleDateFormat(getString(R.string.detail_date_format), Locale.ENGLISH);
         detailDate.setText(sdf.format(new Date(entry.getTimestamp())));
 
+        // Count words
         int words = entry.getText().trim().split("\\s+").length;
-        wordCount.setText(words + (words == 1 ? " palavra" : " palavras"));
+        String wordLabel = words == 1 ? getString(R.string.word_singular) : getString(R.string.words_plural);
+        wordCount.setText(String.format(getString(R.string.word_count_format), words, wordLabel));
 
-        // Carregar texto com formatação
+        // Load text with formatting
         String formatting = entry.getFormatting();
         if (formatting != null && !formatting.isEmpty()) {
             android.text.SpannableString formatted =
@@ -90,6 +93,7 @@ public class DetailActivity extends AppCompatActivity {
             detailContent.setText(entry.getText());
         }
 
+        // Load image
         if (entry.getImagePath() != null) {
             Bitmap bmp = BitmapFactory.decodeFile(entry.getImagePath());
             if (bmp != null) {
@@ -117,13 +121,17 @@ public class DetailActivity extends AppCompatActivity {
 
     private void showImageOptions() {
         String[] options = hasCustomImage ?
-                new String[]{"Escolher nova imagem", "Voltar à cor padrão"} :
-                new String[]{"Escolher imagem"};
+                new String[]{
+                        getString(R.string.choose_new_image_option),
+                        getString(R.string.back_to_default_color)
+                } :
+                new String[]{getString(R.string.choose_image_option)};
 
         new AlertDialog.Builder(this)
-                .setTitle("Imagem de fundo")
+                .setTitle(getString(R.string.image_background_title))
                 .setItems(options, (dialog, which) -> {
                     if (hasCustomImage && which == 1) {
+                        // Delete custom image file
                         if (entry.getImagePath() != null) {
                             File f = new File(entry.getImagePath());
                             if (f.exists()) f.delete();
@@ -135,7 +143,7 @@ public class DetailActivity extends AppCompatActivity {
                         openImagePicker();
                     }
                 })
-                .setNegativeButton("Cancelar", null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show();
     }
 
@@ -155,23 +163,25 @@ public class DetailActivity extends AppCompatActivity {
                 try {
                     Bitmap selectedBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
 
+                    // Save image to internal storage
                     String filename = "entry_" + entry.getId() + ".png";
                     File file = new File(getFilesDir(), filename);
                     FileOutputStream out = new FileOutputStream(file);
                     selectedBitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
                     out.close();
 
+                    // Update entry with image path
                     entry.setImagePath(file.getAbsolutePath());
                     repo.updateEntry(entry, task -> {
                         runOnUiThread(() -> {
                             headerImage.setImageBitmap(selectedBitmap);
                             hasCustomImage = true;
-                            Toast.makeText(this, "Imagem atualizada", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, getString(R.string.image_updated), Toast.LENGTH_SHORT).show();
                         });
                     });
 
                 } catch (IOException e) {
-                    Toast.makeText(this, "Erro ao carregar imagem", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.image_load_error), Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -179,17 +189,17 @@ public class DetailActivity extends AppCompatActivity {
 
     private void showDeleteConfirmation() {
         new AlertDialog.Builder(this)
-                .setTitle("Eliminar entrada")
-                .setMessage("Tens a certeza que queres eliminar esta entrada?")
-                .setPositiveButton("Eliminar", (dialog, which) -> {
+                .setTitle(getString(R.string.delete_entry_confirmation_title))
+                .setMessage(getString(R.string.delete_entry_confirmation_message))
+                .setPositiveButton(getString(R.string.delete_button), (dialog, which) -> {
                     repo.deleteEntry(entry, task -> {
                         runOnUiThread(() -> {
-                            Toast.makeText(this, "Entrada eliminada", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, getString(R.string.entry_deleted_success), Toast.LENGTH_SHORT).show();
                             finish();
                         });
                     });
                 })
-                .setNegativeButton("Cancelar", null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show();
     }
 }

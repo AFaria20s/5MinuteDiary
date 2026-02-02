@@ -25,39 +25,82 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Complete and robust DataRepository with offline persistence and retry logic
+ * Singleton that handles all Firestore read/write operations for diary entries
+ * and user profiles. Includes an in-memory cache to reduce network calls,
+ * automatic retry on write failures, and real-time listeners.
  */
 public class DataRepository {
 
     private static final String TAG = "DataRepository";
+
+    /** Firestore collection name for diary entries. */
     private static final String COLLECTION_ENTRIES = "diary_entries";
+
+    /** Firestore collection name for user profiles. */
     private static final String COLLECTION_PROFILES = "user_profiles";
+
+    /** Maximum number of automatic retry attempts on write failure. */
     private static final int MAX_RETRIES = 3;
+
+    /** Delay in ms between each retry attempt. */
     private static final long RETRY_DELAY_MS = 1000;
 
     private static DataRepository instance;
     private FirebaseFirestore db;
     private FirebaseAuth auth;
 
-    // Cache
+    // ─── Cache ───────────────────────────────────────────────────────────────
+
+    /** Local copy of the current user's entries, sorted newest first. */
     private List<DiaryEntry> cachedEntries = new ArrayList<>();
+
+    /** Local copy of the current user's profile. Null if not yet loaded. */
     private UserProfile cachedProfile = null;
+
+    /** True when cachedEntries holds valid data and can be returned directly. */
     private boolean entriesCacheValid = false;
+
+    /** True when cachedProfile holds valid data. Set to false after a single-field update to force a refresh. */
     private boolean profileCacheValid = false;
 
-    // Listeners
+    // ─── Real-time listeners ─────────────────────────────────────────────────
+
+    /** Registration handle for the entries snapshot listener. Null when inactive. */
     private ListenerRegistration entriesListener = null;
+
+    /** Registration handle for the profile snapshot listener. Null when inactive. */
     private ListenerRegistration profileListener = null;
 
+    // ─── Write lock ──────────────────────────────────────────────────────────
+
+    /**
+     * Lock object used to prevent two saveOrUpdateTodayEntry calls from running
+     * at the same time, which would otherwise create duplicate entries.
+     */
     private final Object saveLock = new Object();
+
+    /** True while a save operation is in progress. Guarded by saveLock. */
     private boolean isSaving = false;
 
+    // ─── Lifecycle ───────────────────────────────────────────────────────────
+
+    /**
+     * Private constructor. Initialises Firestore, Auth, and enables offline persistence.
+     *
+     * @param context application context (avoids memory leaks in the singleton)
+     */
     private DataRepository(Context context) {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         enableOfflinePersistence();
     }
 
+    /**
+     * Returns the singleton instance, creating it if needed.
+     *
+     * @param context any context; internally uses getApplicationContext()
+     * @return the single DataRepository instance
+     */
     public static synchronized DataRepository getInstance(Context context) {
         if (instance == null) {
             instance = new DataRepository(context.getApplicationContext());
@@ -65,6 +108,12 @@ public class DataRepository {
         return instance;
     }
 
+    // ─── Configuration ───────────────────────────────────────────────────────
+
+    /**
+     * Enables Firestore offline persistence with unlimited cache size.
+     * All reads and writes work without a network connection and sync automatically when online.
+     */
     private void enableOfflinePersistence() {
         try {
             FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
@@ -78,11 +127,20 @@ public class DataRepository {
         }
     }
 
+    /**
+     * Returns the UID of the currently signed-in Firebase user, or null if none.
+     */
     private String getCurrentUserId() {
         FirebaseUser user = auth.getCurrentUser();
         return user != null ? user.getUid() : null;
     }
 
+    // ─── Cache management ────────────────────────────────────────────────────
+
+    /**
+     * Clears all cached data and removes any active real-time listeners.
+     * Should be called on logout to avoid leftover data from the previous user.
+     */
     public void clearCache() {
         cachedEntries.clear();
         cachedProfile = null;
@@ -104,7 +162,15 @@ public class DataRepository {
     // ========== DIARY ENTRIES ==========
 
     /**
-     * Save or update today's entry with retry logic
+     * Saves or updates today's diary entry.
+     *
+     * <p>Checks whether an entry already exists for today. If it does, updates it;
+     * otherwise creates a new one. Uses saveLock to prevent duplicate entries when
+     * auto-save and manual save fire at the same time.</p>
+     *
+     * @param text        plain text content of the entry
+     * @param formatting  serialised formatting data (from TextFormattingSerializer); can be null
+     * @param listener    callback when the operation completes; can be null
      */
     public void saveOrUpdateTodayEntry(String text, String formatting, OnCompleteListener<Void> listener) {
         String userId = getCurrentUserId();
@@ -116,7 +182,7 @@ public class DataRepository {
 
         synchronized (saveLock) {
             if (isSaving) {
-                // Já há um save em andamento — ignora esta chamada
+                // A save is already in progress — skip this call
                 if (listener != null) listener.onComplete(null);
                 return;
             }
@@ -144,6 +210,14 @@ public class DataRepository {
         });
     }
 
+    /**
+     * Adds a new entry to Firestore with automatic retry on failure.
+     * On success, inserts the entry at the beginning of the local cache.
+     *
+     * @param entry      the entry to add; its id will be set by Firestore after success
+     * @param retryCount current attempt number (0 on first call)
+     * @param listener   callback when done; can be null
+     */
     private void addEntryWithRetry(DiaryEntry entry, int retryCount, OnCompleteListener<Void> listener) {
         String userId = getCurrentUserId();
         if (userId == null) {
@@ -169,7 +243,6 @@ public class DataRepository {
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Failed to add entry (attempt " + (retryCount + 1) + ")", e);
                     if (retryCount < MAX_RETRIES) {
-                        // Retry after delay
                         new android.os.Handler(android.os.Looper.getMainLooper())
                                 .postDelayed(() -> addEntryWithRetry(entry, retryCount + 1, listener), RETRY_DELAY_MS);
                     } else {
@@ -179,6 +252,15 @@ public class DataRepository {
                 });
     }
 
+    /**
+     * Updates an existing entry in Firestore with automatic retry on failure.
+     * Uses merge so only the provided fields are written.
+     * On success, updates the matching entry in the local cache.
+     *
+     * @param entry      the entry with updated data; must have a valid id
+     * @param retryCount current attempt number (0 on first call)
+     * @param listener   callback when done; can be null
+     */
     private void updateEntryWithRetry(DiaryEntry entry, int retryCount, OnCompleteListener<Void> listener) {
         if (entry.getId() == null) {
             Log.e(TAG, "Entry ID is null");
@@ -206,6 +288,10 @@ public class DataRepository {
                 });
     }
 
+    /**
+     * Replaces the cached copy of an entry with the given updated version,
+     * matched by id. Does nothing if the entry is not in the cache.
+     */
     private void updateCachedEntry(DiaryEntry entry) {
         for (int i = 0; i < cachedEntries.size(); i++) {
             if (cachedEntries.get(i).getId() != null &&
@@ -217,14 +303,21 @@ public class DataRepository {
     }
 
     /**
-     * Update existing entry (public method for DetailActivity, etc)
+     * Public method to update an existing entry. Used by detail/edit activities.
+     *
+     * @param entry    the entry with updated data; must have a valid id
+     * @param listener callback when done; can be null
      */
     public void updateEntry(DiaryEntry entry, OnCompleteListener<Void> listener) {
         updateEntryWithRetry(entry, 0, listener);
     }
 
     /**
-     * Get all entries with cache
+     * Returns all diary entries for the current user, sorted newest first.
+     * Returns from cache if available; otherwise fetches from Firestore and updates the cache.
+     * On network failure, falls back to the current cache contents.
+     *
+     * @param listener callback that receives the list of entries (empty list if none)
      */
     public void getEntries(OnSuccessListener<List<DiaryEntry>> listener) {
         String userId = getCurrentUserId();
@@ -265,7 +358,13 @@ public class DataRepository {
     }
 
     /**
-     * Get entry for specific day
+     * Returns the diary entry for a specific day, or null if none exists.
+     *
+     * <p>First checks the local cache. If not found there (or cache is invalid),
+     * queries Firestore using a timestamp range covering the full day (00:00:00 to 23:59:59).</p>
+     *
+     * @param day      the target day in "yyyy-MM-dd" format
+     * @param listener callback that receives the entry, or null if not found
      */
     public void getEntryForDay(String day, OnSuccessListener<DiaryEntry> listener) {
         String userId = getCurrentUserId();
@@ -338,7 +437,11 @@ public class DataRepository {
     }
 
     /**
-     * Delete entry
+     * Deletes a single entry from Firestore and removes it from the local cache.
+     * The cache remains valid after removal.
+     *
+     * @param entry    the entry to delete; must have a valid id
+     * @param listener callback when done; can be null
      */
     public void deleteEntry(DiaryEntry entry, OnCompleteListener<Void> listener) {
         if (entry.getId() == null) {
@@ -352,7 +455,7 @@ public class DataRepository {
                 .delete()
                 .addOnSuccessListener(aVoid -> {
                     cachedEntries.remove(entry);
-                    entriesCacheValid = true; // Cache still valid after removal
+                    entriesCacheValid = true;
                     Log.d(TAG, "Entry deleted: " + entry.getId());
                     if (listener != null) listener.onComplete(null);
                 })
@@ -362,8 +465,14 @@ public class DataRepository {
                 });
     }
 
+    // ─── Real-time listeners ─────────────────────────────────────────────────
+
     /**
-     * Real-time listener for entries
+     * Starts a real-time listener on the entries collection.
+     * The callback fires automatically whenever entries are added, updated, or deleted.
+     * Replaces any previously active entries listener.
+     *
+     * @param listener callback that receives the full updated entry list on each change
      */
     public void startEntriesListener(OnSuccessListener<List<DiaryEntry>> listener) {
         String userId = getCurrentUserId();
@@ -400,6 +509,10 @@ public class DataRepository {
                 });
     }
 
+    /**
+     * Removes the active entries real-time listener, if one exists.
+     * Call this when the listening activity or component is destroyed.
+     */
     public void stopEntriesListener() {
         if (entriesListener != null) {
             entriesListener.remove();
@@ -408,8 +521,17 @@ public class DataRepository {
         }
     }
 
+    // ─── Streak ──────────────────────────────────────────────────────────────
+
     /**
-     * Calculate current streak
+     * Calculates the current consecutive-day streak.
+     *
+     * <p>If today already has an entry, the count starts from today.
+     * If not, it starts from yesterday (so the streak isn't broken simply
+     * because the user hasn't written yet today). Counts backwards day by day
+     * until a gap is found, up to a maximum of 365 days.</p>
+     *
+     * @param listener callback that receives the streak count (0 if no entries exist)
      */
     public void calculateStreak(OnSuccessListener<Integer> listener) {
         getEntries(allEntries -> {
@@ -475,8 +597,14 @@ public class DataRepository {
         });
     }
 
+    // ─── Entry count ─────────────────────────────────────────────────────────
+
     /**
-     * Get entry count
+     * Returns the total number of entries for the current user.
+     * Uses the cache size if available; otherwise queries Firestore.
+     * Falls back to cache size on network failure.
+     *
+     * @param listener callback that receives the entry count
      */
     public void getEntryCount(OnSuccessListener<Integer> listener) {
         if (entriesCacheValid) {
@@ -505,7 +633,12 @@ public class DataRepository {
     }
 
     /**
-     * Delete all entries (for account deletion)
+     * Deletes all entries for the current user. Used during account deletion.
+     *
+     * <p>Note: deletions are fired individually per document and are not atomic.
+     * If it fails midway, some documents may already have been deleted.</p>
+     *
+     * @param listener callback when done; can be null
      */
     public void deleteAllEntries(OnCompleteListener<Void> listener) {
         String userId = getCurrentUserId();
@@ -546,7 +679,10 @@ public class DataRepository {
     // ========== USER PROFILE ==========
 
     /**
-     * Get user profile with cache
+     * Fetches the current user's profile from Firestore.
+     * Returns from cache if available. On network failure, falls back to the cached profile.
+     *
+     * @param listener callback that receives the UserProfile, or null if it doesn't exist
      */
     public void getUserProfile(OnSuccessListener<UserProfile> listener) {
         String userId = getCurrentUserId();
@@ -587,7 +723,11 @@ public class DataRepository {
     }
 
     /**
-     * Update user profile
+     * Creates or updates the full user profile in Firestore using merge.
+     * The profile's id is automatically set to the current user's UID.
+     *
+     * @param profile  the profile to save
+     * @param listener callback when done; can be null
      */
     public void updateUserProfile(UserProfile profile, OnCompleteListener<Void> listener) {
         String userId = getCurrentUserId();
@@ -615,7 +755,13 @@ public class DataRepository {
     }
 
     /**
-     * Update single profile field
+     * Updates a single field on the user's profile document.
+     * More efficient than updateUserProfile when only one value changes.
+     * Invalidates the profile cache so the next read fetches fresh data.
+     *
+     * @param field    the Firestore field name (e.g. "displayName")
+     * @param value    the new value for that field
+     * @param listener callback when done; can be null
      */
     public void updateUserProfileField(String field, Object value, OnCompleteListener<Void> listener) {
         String userId = getCurrentUserId();
@@ -643,7 +789,10 @@ public class DataRepository {
     }
 
     /**
-     * Get or create user profile
+     * Returns the user's profile, creating a new one with default values if it doesn't exist yet.
+     * Useful on first login or when the profile hasn't been initialised.
+     *
+     * @param listener callback that receives the existing or newly created profile (never null)
      */
     public void getOrCreateUserProfile(OnSuccessListener<UserProfile> listener) {
         getUserProfile(profile -> {
@@ -660,7 +809,11 @@ public class DataRepository {
     }
 
     /**
-     * Real-time listener for profile
+     * Starts a real-time listener on the user's profile document.
+     * The callback fires automatically whenever the profile is updated.
+     * Replaces any previously active profile listener.
+     *
+     * @param listener callback that receives the updated profile on each change
      */
     public void startProfileListener(OnSuccessListener<UserProfile> listener) {
         String userId = getCurrentUserId();
@@ -694,6 +847,10 @@ public class DataRepository {
                 });
     }
 
+    /**
+     * Removes the active profile real-time listener, if one exists.
+     * Call this when the listening activity or component is destroyed.
+     */
     public void stopProfileListener() {
         if (profileListener != null) {
             profileListener.remove();
