@@ -25,7 +25,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingTop="30dp"
-                android:paddingBottom="20dp"
+                android:paddingBottom="10dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
                 android:background="@drawable/profile_gradient"
@@ -127,10 +127,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="top|start"
-                    android:hint="Começa a escrever..."
+                    android:hint="@string/start_writing_hint"
                     android:inputType="textMultiLine|textCapSentences"
                     android:background="@android:color/transparent"
-                    android:padding="28dp"
+                    android:padding="20dp"
                     android:paddingEnd="110dp"
                     android:textSize="18sp"
                     android:textColor="#1a1a1a"
@@ -149,7 +149,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp"
                 android:layout_marginEnd="20dp"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="16dp"
                 app:cardBackgroundColor="#FFFFFF"
@@ -225,6 +225,14 @@
                             android:textStyle="bold"
                             android:layout_marginBottom="8dp"
                             android:letterSpacing="0.1" />
+
+                        <ImageButton
+                            android:id="@+id/colorBlackButton"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/color_circle_black"
+                            android:layout_marginBottom="10dp"
+                            android:contentDescription="Preto" />
 
                         <ImageButton
                             android:id="@+id/colorRedButton"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- App Name -->
-    <string name="app_name">Five Minute Diary</string>
+    <string name="app_name" translatable="false">5 Diary</string>
 
     <!-- Main Activity -->
     <string name="prompt_text">What marked you today?</string>

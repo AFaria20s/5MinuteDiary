@@ -54,6 +54,7 @@ public class ExpandedEditActivity extends BaseActivity {
     private ImageButton highlightGreenButton;
     private ImageButton highlightPinkButton;
     private ImageButton highlightBlueButton;
+    private ImageButton colorBlackButton;
     private ImageButton colorRedButton;
     private ImageButton colorBlueButton;
     private ImageButton colorGreenButton;
@@ -140,6 +141,7 @@ public class ExpandedEditActivity extends BaseActivity {
         highlightGreenButton = findViewById(R.id.highlightGreenButton);
         highlightPinkButton = findViewById(R.id.highlightPinkButton);
         highlightBlueButton = findViewById(R.id.highlightBlueButton);
+        colorBlackButton = findViewById(R.id.colorBlackButton);
         colorRedButton = findViewById(R.id.colorRedButton);
         colorBlueButton = findViewById(R.id.colorBlueButton);
         colorGreenButton = findViewById(R.id.colorGreenButton);
@@ -253,6 +255,7 @@ public class ExpandedEditActivity extends BaseActivity {
         highlightBlueButton.setOnClickListener(v -> toggleHighlight(Color.parseColor("#DBEAFE")));
 
         colorRedButton.setOnClickListener(v -> toggleTextColor(Color.parseColor("#EF4444")));
+        colorBlackButton.setOnClickListener(v -> toggleTextColor(Color.parseColor("#000000")));
         colorBlueButton.setOnClickListener(v -> toggleTextColor(Color.parseColor("#3B82F6")));
         colorGreenButton.setOnClickListener(v -> toggleTextColor(Color.parseColor("#10B981")));
 
@@ -416,6 +419,7 @@ public class ExpandedEditActivity extends BaseActivity {
         updateButtonState(highlightBlueButton, isHighlightActive(Color.parseColor("#DBEAFE")));
 
         updateButtonState(colorRedButton, isColorActive(Color.parseColor("#EF4444")));
+        updateButtonState(colorBlackButton, isColorActive(Color.parseColor("#000000")));
         updateButtonState(colorBlueButton, isColorActive(Color.parseColor("#3B82F6")));
         updateButtonState(colorGreenButton, isColorActive(Color.parseColor("#10B981")));
     }
