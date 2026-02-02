@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,10 +22,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
  * Base activity that applies the selected language to all child activities
  */
 public abstract class BaseActivity extends AppCompatActivity {
+    private GestureDetector gestureDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setupSwipeGesture();
     }
 
     @Override
@@ -33,11 +36,55 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.attachBaseContext(LocaleManager.applyLanguage(newBase));
     }
 
+    private void setupSwipeGesture() {
+        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            private static final int SWIPE_THRESHOLD = 200;
+            private static final int SWIPE_VELOCITY_THRESHOLD = 100;
+
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                float diffX = e2.getX() - e1.getX();
+                float diffY = e2.getY() - e1.getY();
+
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                        if (diffX > 0) {
+                            onSwipeRight();
+                        } else {
+                            onSwipeLeft();
+                        }
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+    }
+
+    private void onSwipeLeft() {
+        if (this instanceof MainActivity) {
+            navigateToActivity(ProfileActivity.class);
+        } else if (this instanceof ListActivity) {
+            navigateToActivity(MainActivity.class);
+        }
+    }
+
+    private void onSwipeRight() {
+        if (this instanceof ProfileActivity) {
+            navigateToActivity(MainActivity.class);
+        } else if (this instanceof MainActivity) {
+            navigateToActivity(ListActivity.class);
+        }
+    }
+
     /**
      * Hide keyboard when touching outside EditText fields
      */
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
+        gestureDetector.onTouchEvent(event);
+
+        // Depois faz o comportamento do teclado
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             View v = getCurrentFocus();
             if (v instanceof EditText) {
