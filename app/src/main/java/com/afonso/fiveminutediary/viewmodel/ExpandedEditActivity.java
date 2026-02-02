@@ -1,6 +1,8 @@
 package com.afonso.fiveminutediary.viewmodel;
 
+import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,14 +16,17 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.cardview.widget.CardView;
 
 import com.afonso.fiveminutediary.R;
@@ -67,6 +72,7 @@ public class ExpandedEditActivity extends BaseActivity {
     private Stack<EditorState> redoStack = new Stack<>();
     private boolean isUndoRedoOperation = false;
     private boolean isRestoringState = false;
+    private boolean isApplyingFormatting = false;
 
     private boolean isBoldActive = false;
     private boolean isItalicActive = false;
@@ -78,6 +84,9 @@ public class ExpandedEditActivity extends BaseActivity {
 
     private Handler autoSaveHandler;
     private Runnable autoSaveRunnable;
+
+    // Para rastrear o último cursor position quando formatação foi ativada
+    private int lastFormattingTogglePosition = -1;
 
     private static class EditorState {
         String text;
@@ -106,7 +115,7 @@ public class ExpandedEditActivity extends BaseActivity {
         setupListeners();
         setupAutoSave();
         animateEntrance();
-
+        setupBackPressHandler();
         saveCurrentState();
     }
 
@@ -250,32 +259,82 @@ public class ExpandedEditActivity extends BaseActivity {
 
         toggleFormattingButton.setOnClickListener(v -> toggleFormattingPanel());
 
-        boldButton.setOnClickListener(v -> toggleBold());
-        italicButton.setOnClickListener(v -> toggleItalic());
-        underlineButton.setOnClickListener(v -> toggleUnderline());
+        // Formatting buttons agora aplicam a seleção E ativam para texto futuro
+        boldButton.setOnClickListener(v -> {
+            toggleBold();
+            applyFormattingToSelection();
+        });
 
-        highlightYellowButton.setOnClickListener(v -> toggleHighlight(Color.parseColor("#FEF3C7")));
-        highlightGreenButton.setOnClickListener(v -> toggleHighlight(Color.parseColor("#D1FAE5")));
-        highlightPinkButton.setOnClickListener(v -> toggleHighlight(Color.parseColor("#FCE7F3")));
-        highlightBlueButton.setOnClickListener(v -> toggleHighlight(Color.parseColor("#DBEAFE")));
+        italicButton.setOnClickListener(v -> {
+            toggleItalic();
+            applyFormattingToSelection();
+        });
 
-        colorRedButton.setOnClickListener(v -> toggleTextColor(Color.parseColor("#EF4444")));
-        colorBlackButton.setOnClickListener(v -> toggleTextColor(Color.parseColor("#000000")));
-        colorBlueButton.setOnClickListener(v -> toggleTextColor(Color.parseColor("#3B82F6")));
-        colorGreenButton.setOnClickListener(v -> toggleTextColor(Color.parseColor("#10B981")));
+        underlineButton.setOnClickListener(v -> {
+            toggleUnderline();
+            applyFormattingToSelection();
+        });
+
+        highlightYellowButton.setOnClickListener(v -> {
+            toggleHighlight(Color.parseColor("#FEF3C7"));
+            applyFormattingToSelection();
+        });
+
+        highlightGreenButton.setOnClickListener(v -> {
+            toggleHighlight(Color.parseColor("#D1FAE5"));
+            applyFormattingToSelection();
+        });
+
+        highlightPinkButton.setOnClickListener(v -> {
+            toggleHighlight(Color.parseColor("#FCE7F3"));
+            applyFormattingToSelection();
+        });
+
+        highlightBlueButton.setOnClickListener(v -> {
+            toggleHighlight(Color.parseColor("#DBEAFE"));
+            applyFormattingToSelection();
+        });
+
+        colorRedButton.setOnClickListener(v -> {
+            toggleTextColor(Color.parseColor("#EF4444"));
+            applyFormattingToSelection();
+        });
+
+        colorBlackButton.setOnClickListener(v -> {
+            toggleTextColor(Color.parseColor("#000000"));
+            applyFormattingToSelection();
+        });
+
+        colorBlueButton.setOnClickListener(v -> {
+            toggleTextColor(Color.parseColor("#3B82F6"));
+            applyFormattingToSelection();
+        });
+
+        colorGreenButton.setOnClickListener(v -> {
+            toggleTextColor(Color.parseColor("#10B981"));
+            applyFormattingToSelection();
+        });
 
         expandedInput.addTextChangedListener(new TextWatcher() {
+            private int previousLength = 0;
+
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                previousLength = s.length();
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (isRestoringState || isUndoRedoOperation) return;
+                if (isRestoringState || isUndoRedoOperation || isApplyingFormatting) return;
 
                 updateCharCount();
 
-                if (count > 0 && before == 0 && hasActiveFormatting()) {
-                    applyFormattingToNewText(start, count);
+                // Texto foi ADICIONADO (não deletado)
+                if (count > 0 && s.length() > previousLength) {
+                    // Aplica formatação ativa ao novo texto
+                    if (hasActiveFormatting()) {
+                        applyFormattingToNewText(start, count);
+                    }
                 }
 
                 saveCurrentState();
@@ -285,6 +344,102 @@ public class ExpandedEditActivity extends BaseActivity {
             @Override
             public void afterTextChanged(Editable s) {}
         });
+    }
+
+    /**
+     * Aplica a formatação atual à seleção de texto (se houver)
+     */
+    private void applyFormattingToSelection() {
+        int selectionStart = expandedInput.getSelectionStart();
+        int selectionEnd = expandedInput.getSelectionEnd();
+
+        // Se há texto selecionado, aplica formatação
+        if (selectionStart != selectionEnd && selectionStart >= 0 && selectionEnd >= 0) {
+            isApplyingFormatting = true;
+
+            int start = Math.min(selectionStart, selectionEnd);
+            int end = Math.max(selectionStart, selectionEnd);
+
+            Editable editable = expandedInput.getText();
+            if (editable != null && start < end && end <= editable.length()) {
+                // Remove formatação antiga primeiro
+                removeFormattingFromRange(editable, start, end);
+
+                // Aplica nova formatação
+                applyActiveFormattingToRange(editable, start, end);
+
+                // Salva estado
+                saveCurrentState();
+                scheduleAutoSave();
+            }
+
+            isApplyingFormatting = false;
+        }
+
+        // Marca a posição para aplicar formatação ao próximo texto digitado
+        lastFormattingTogglePosition = expandedInput.getSelectionStart();
+    }
+
+    /**
+     * Remove toda formatação de um range específico
+     */
+    private void removeFormattingFromRange(Editable editable, int start, int end) {
+        // Remove bold/italic
+        StyleSpan[] styleSpans = editable.getSpans(start, end, StyleSpan.class);
+        for (StyleSpan span : styleSpans) {
+            editable.removeSpan(span);
+        }
+
+        // Remove underline
+        UnderlineSpan[] underlineSpans = editable.getSpans(start, end, UnderlineSpan.class);
+        for (UnderlineSpan span : underlineSpans) {
+            editable.removeSpan(span);
+        }
+
+        // Remove text color
+        ForegroundColorSpan[] fgSpans = editable.getSpans(start, end, ForegroundColorSpan.class);
+        for (ForegroundColorSpan span : fgSpans) {
+            editable.removeSpan(span);
+        }
+
+        // Remove highlight
+        BackgroundColorSpan[] bgSpans = editable.getSpans(start, end, BackgroundColorSpan.class);
+        for (BackgroundColorSpan span : bgSpans) {
+            editable.removeSpan(span);
+        }
+    }
+
+    /**
+     * Aplica a formatação ativa a um range
+     */
+    private void applyActiveFormattingToRange(Editable editable, int start, int end) {
+        if (start >= end) return;
+
+        int spanFlags = Spannable.SPAN_EXCLUSIVE_EXCLUSIVE;
+
+        try {
+            if (isBoldActive) {
+                editable.setSpan(new StyleSpan(Typeface.BOLD), start, end, spanFlags);
+            }
+
+            if (isItalicActive) {
+                editable.setSpan(new StyleSpan(Typeface.ITALIC), start, end, spanFlags);
+            }
+
+            if (isUnderlineActive) {
+                editable.setSpan(new UnderlineSpan(), start, end, spanFlags);
+            }
+
+            if (activeHighlightColor != null) {
+                editable.setSpan(new BackgroundColorSpan(activeHighlightColor), start, end, spanFlags);
+            }
+
+            if (activeTextColor != null) {
+                editable.setSpan(new ForegroundColorSpan(activeTextColor), start, end, spanFlags);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error applying formatting to range", e);
+        }
     }
 
     private void toggleFormattingPanel() {
@@ -339,34 +494,41 @@ public class ExpandedEditActivity extends BaseActivity {
 
     private void toggleBold() {
         isBoldActive = !isBoldActive;
+        lastFormattingTogglePosition = expandedInput.getSelectionStart();
         updateButtonStates();
     }
 
     private void toggleItalic() {
         isItalicActive = !isItalicActive;
+        lastFormattingTogglePosition = expandedInput.getSelectionStart();
         updateButtonStates();
     }
 
     private void toggleUnderline() {
         isUnderlineActive = !isUnderlineActive;
+        lastFormattingTogglePosition = expandedInput.getSelectionStart();
         updateButtonStates();
     }
 
     private void toggleHighlight(int color) {
+        // Se clicar na mesma cor, desativa
         if (activeHighlightColor != null && activeHighlightColor == color) {
             activeHighlightColor = null;
         } else {
             activeHighlightColor = color;
         }
+        lastFormattingTogglePosition = expandedInput.getSelectionStart();
         updateButtonStates();
     }
 
     private void toggleTextColor(int color) {
+        // Se clicar na mesma cor, desativa
         if (activeTextColor != null && activeTextColor == color) {
             activeTextColor = null;
         } else {
             activeTextColor = color;
         }
+        lastFormattingTogglePosition = expandedInput.getSelectionStart();
         updateButtonStates();
     }
 
@@ -375,6 +537,9 @@ public class ExpandedEditActivity extends BaseActivity {
                 activeHighlightColor != null || activeTextColor != null;
     }
 
+    /**
+     * Aplica formatação ao novo texto digitado
+     */
     private void applyFormattingToNewText(int start, int count) {
         Editable editable = expandedInput.getText();
         if (editable == null) return;
@@ -386,7 +551,10 @@ public class ExpandedEditActivity extends BaseActivity {
 
         if (start >= end || count <= 0) return;
 
+        // SPAN_EXCLUSIVE_INCLUSIVE: não se expande antes, mas se expande depois
         int spanFlags = Spannable.SPAN_EXCLUSIVE_INCLUSIVE;
+
+        isApplyingFormatting = true;
 
         try {
             if (isBoldActive) {
@@ -411,6 +579,8 @@ public class ExpandedEditActivity extends BaseActivity {
         } catch (Exception e) {
             Log.e(TAG, "Error applying formatting", e);
         }
+
+        isApplyingFormatting = false;
     }
 
     private void updateButtonStates() {
@@ -444,7 +614,7 @@ public class ExpandedEditActivity extends BaseActivity {
     }
 
     private void saveCurrentState() {
-        if (isUndoRedoOperation || isRestoringState) return;
+        if (isUndoRedoOperation || isRestoringState || isApplyingFormatting) return;
 
         try {
             CharSequence text = expandedInput.getText();
@@ -536,10 +706,6 @@ public class ExpandedEditActivity extends BaseActivity {
         charCountText.setText(getString(R.string.char_count, count));
     }
 
-    private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
     private void animateEntrance() {
         rootCard.setAlpha(0f);
         rootCard.setScaleX(0.95f);
@@ -554,18 +720,32 @@ public class ExpandedEditActivity extends BaseActivity {
                 .start();
     }
 
-    private void finishWithSave() {
-        saveToFirebase();
-
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            setResult(RESULT_OK, getIntent());
-            finish();
-            overridePendingTransition(0, 0);
-        }, 300);
+    private void animateExit() {
+        rootCard.animate()
+                .alpha(0f)
+                .scaleX(0.95f)
+                .scaleY(0.95f)
+                .setDuration(250)
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .withEndAction(() -> {
+                    setResult(RESULT_OK, getIntent());
+                    finish();
+                    overridePendingTransition(0, 0);
+                })
+                .start();
     }
 
-    @Override
-    public void onBackPressed() {
-        finishWithSave();
+    private void finishWithSave() {
+        saveToFirebase();
+        animateExit();
+    }
+
+    private void setupBackPressHandler() {
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                finishWithSave();
+            }
+        });
     }
 }

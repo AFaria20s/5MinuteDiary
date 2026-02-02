@@ -388,23 +388,4 @@ public class MainActivity extends BaseActivity {
         }
         return text.substring(0, 1).toUpperCase() + text.substring(1);
     }
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            View v = getCurrentFocus();
-            if (v instanceof EditText) {
-                Rect outRect = new Rect();
-                v.getGlobalVisibleRect(outRect);
-                if (!outRect.contains((int)event.getRawX(), (int)event.getRawY())) {
-                    v.clearFocus();
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    if (imm != null) {
-                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                    }
-                }
-            }
-        }
-        return super.dispatchTouchEvent(event);
-    }
 }
