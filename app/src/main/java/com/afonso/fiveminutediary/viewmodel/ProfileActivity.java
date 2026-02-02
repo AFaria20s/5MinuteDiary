@@ -95,8 +95,12 @@ public class ProfileActivity extends BaseActivity {
             repo.updateUserProfileField("lastOpenedTimestamp", System.currentTimeMillis(), null);
         }
 
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
-        bottomNav.setSelectedItemId(R.id.nav_profile);
+        updateBottomNavSelection();
+    }
+
+    @Override
+    protected int getNavigationMenuItemId() {
+        return R.id.nav_profile;
     }
 
     @Override
@@ -454,32 +458,6 @@ public class ProfileActivity extends BaseActivity {
                             }
                         }
                     });
-        });
-    }
-
-    private void setupBottomNavigation() {
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
-        bottomNav.setSelectedItemId(R.id.nav_profile);
-
-        bottomNav.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-
-            if (itemId == R.id.nav_home) {
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-                overridePendingTransition(0, 0);
-                return true;
-            } else if (itemId == R.id.nav_history) {
-                Intent intent = new Intent(this, ListActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-                overridePendingTransition(0, 0);
-                return true;
-            } else if (itemId == R.id.nav_profile) {
-                return true;
-            }
-            return false;
         });
     }
 }

@@ -44,8 +44,12 @@ public class ListActivity extends BaseActivity implements DiaryAdapter.OnEntryCl
         // Start realtime listener
         startRealtimeUpdates();
 
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
-        bottomNav.setSelectedItemId(R.id.nav_history);
+        updateBottomNavSelection();
+    }
+
+    @Override
+    protected int getNavigationMenuItemId() {
+        return R.id.nav_history;
     }
 
     @Override
@@ -76,32 +80,6 @@ public class ListActivity extends BaseActivity implements DiaryAdapter.OnEntryCl
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new DiaryAdapter(this, this);
         recyclerView.setAdapter(adapter);
-    }
-
-    private void setupBottomNavigation() {
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
-        bottomNav.setSelectedItemId(R.id.nav_history);
-
-        bottomNav.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-
-            if (itemId == R.id.nav_home) {
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-                overridePendingTransition(0, 0);
-                return true;
-            } else if (itemId == R.id.nav_history) {
-                return true;
-            } else if (itemId == R.id.nav_profile) {
-                Intent intent = new Intent(this, ProfileActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-                overridePendingTransition(0, 0);
-                return true;
-            }
-            return false;
-        });
     }
 
     /**

@@ -83,7 +83,7 @@ public class MainActivity extends BaseActivity {
         initViews();
         loadTodayEntry();
         setupListeners();
-        setupBottomNavigation();
+        setupBottomNavigation(); // Chama o método da superclasse!
         setRandomTexts();
         startClock();
         animateEntrance();
@@ -97,9 +97,12 @@ public class MainActivity extends BaseActivity {
 
         loadTodayEntry();
         startClock();
+        updateBottomNavSelection(); // Atualiza a seleção
+    }
 
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
-        bottomNav.setSelectedItemId(R.id.nav_home);
+    @Override
+    protected int getNavigationMenuItemId() {
+        return R.id.nav_home;
     }
 
     @Override
@@ -377,32 +380,6 @@ public class MainActivity extends BaseActivity {
                 saveCurrentEntry();
             }
         }
-    }
-
-    private void setupBottomNavigation() {
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
-        bottomNav.setSelectedItemId(R.id.nav_home);
-
-        bottomNav.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-
-            if (itemId == R.id.nav_home) {
-                return true;
-            } else if (itemId == R.id.nav_history) {
-                Intent intent = new Intent(MainActivity.this, ListActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-                overridePendingTransition(0, 0);
-                return true;
-            } else if (itemId == R.id.nav_profile) {
-                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-                overridePendingTransition(0, 0);
-                return true;
-            }
-            return false;
-        });
     }
 
     private String capitalize(String text) {
