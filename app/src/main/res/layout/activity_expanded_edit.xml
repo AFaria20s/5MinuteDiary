@@ -42,10 +42,11 @@
 
                     <ImageButton
                         android:id="@+id/closeButton"
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:background="@drawable/circular_ripple_button"
-                        android:src="@android:drawable/ic_menu_close_clear_cancel"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:scaleType="fitCenter"
+                        android:background="@null"
+                        android:src="@drawable/collapse"
                         android:tint="#FFFFFF"
                         android:contentDescription="Fechar" />
 
@@ -64,32 +65,34 @@
 
                     <ImageButton
                         android:id="@+id/toggleFormattingButton"
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:background="@drawable/circular_ripple_button"
-                        android:src="@android:drawable/ic_menu_edit"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:scaleType="fitCenter"
+                        android:background="@null"
+                        android:src="@drawable/brush"
                         android:tint="#FFFFFF"
                         android:layout_marginEnd="8dp"
                         android:contentDescription="Formatação" />
 
                     <ImageButton
                         android:id="@+id/undoButton"
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:background="@drawable/circular_ripple_button"
-                        android:src="@android:drawable/ic_menu_revert"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:scaleType="fitCenter"
+                        android:background="@null"
+                        android:src="@drawable/undo"
                         android:tint="#FFFFFF"
                         android:layout_marginEnd="8dp"
                         android:contentDescription="Desfazer" />
 
                     <ImageButton
                         android:id="@+id/redoButton"
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:background="@drawable/circular_ripple_button"
-                        android:src="@android:drawable/ic_menu_revert"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:scaleType="fitCenter"
+                        android:background="@null"
+                        android:src="@drawable/redo"
                         android:tint="#FFFFFF"
-                        android:rotation="180"
                         android:contentDescription="Refazer" />
 
                 </LinearLayout>
@@ -146,7 +149,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp"
                 android:layout_marginEnd="20dp"
-                android:visibility="gone"
+                android:visibility="visible"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="16dp"
                 app:cardBackgroundColor="#FFFFFF"
@@ -182,7 +185,7 @@
                             android:layout_width="60dp"
                             android:layout_height="60dp"
                             android:background="@drawable/format_button_modern"
-                            android:src="@android:drawable/ic_menu_edit"
+                            android:src="@drawable/bold_font"
                             android:tint="#1F2937"
                             android:layout_marginBottom="10dp"
                             android:contentDescription="Negrito" />
@@ -192,7 +195,7 @@
                             android:layout_width="60dp"
                             android:layout_height="60dp"
                             android:background="@drawable/format_button_modern"
-                            android:src="@android:drawable/ic_menu_edit"
+                            android:src="@drawable/italic_font"
                             android:tint="#1F2937"
                             android:layout_marginBottom="10dp"
                             android:contentDescription="Itálico" />
@@ -202,7 +205,7 @@
                             android:layout_width="60dp"
                             android:layout_height="60dp"
                             android:background="@drawable/format_button_modern"
-                            android:src="@android:drawable/ic_menu_edit"
+                            android:src="@drawable/underline_font"
                             android:tint="#1F2937"
                             android:layout_marginBottom="16dp"
                             android:contentDescription="Sublinhado" />
@@ -216,7 +219,47 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Realce"
+                            android:text="Texto"
+                            android:textSize="10sp"
+                            android:textColor="#9CA3AF"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="8dp"
+                            android:letterSpacing="0.1" />
+
+                        <ImageButton
+                            android:id="@+id/colorRedButton"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/color_circle_red"
+                            android:layout_marginBottom="10dp"
+                            android:contentDescription="Vermelho" />
+
+                        <ImageButton
+                            android:id="@+id/colorBlueButton"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/color_circle_blue"
+                            android:layout_marginBottom="10dp"
+                            android:contentDescription="Azul" />
+
+                        <ImageButton
+                            android:id="@+id/colorGreenButton"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/color_circle_green"
+                            android:layout_marginBottom="10dp"
+                            android:contentDescription="Verde" />
+
+                        <View
+                            android:layout_width="40dp"
+                            android:layout_height="2dp"
+                            android:background="#E5E7EB"
+                            android:layout_marginBottom="16dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Highlight"
                             android:textSize="10sp"
                             android:textColor="#9CA3AF"
                             android:textStyle="bold"
@@ -254,46 +297,6 @@
                             android:background="@drawable/highlight_circle_blue"
                             android:layout_marginBottom="16dp"
                             android:contentDescription="Azul" />
-
-                        <View
-                            android:layout_width="40dp"
-                            android:layout_height="2dp"
-                            android:background="#E5E7EB"
-                            android:layout_marginBottom="16dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Cor"
-                            android:textSize="10sp"
-                            android:textColor="#9CA3AF"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="8dp"
-                            android:letterSpacing="0.1" />
-
-                        <ImageButton
-                            android:id="@+id/colorRedButton"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:background="@drawable/color_circle_red"
-                            android:layout_marginBottom="10dp"
-                            android:contentDescription="Vermelho" />
-
-                        <ImageButton
-                            android:id="@+id/colorBlueButton"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:background="@drawable/color_circle_blue"
-                            android:layout_marginBottom="10dp"
-                            android:contentDescription="Azul" />
-
-                        <ImageButton
-                            android:id="@+id/colorGreenButton"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:background="@drawable/color_circle_green"
-                            android:layout_marginBottom="10dp"
-                            android:contentDescription="Verde" />
 
                     </LinearLayout>
 

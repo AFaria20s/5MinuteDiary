@@ -45,7 +45,7 @@
                         android:id="@+id/dayOfWeek"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Segunda"
+                        android:text="@string/default_main_day"
                         android:textSize="16sp"
                         android:textColor="#6B7280"
                         android:fontFamily="sans-serif-light" />
@@ -62,7 +62,7 @@
                         android:id="@+id/dateText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="27 de Janeiro"
+                        android:text="@string/default_main_date"
                         android:textSize="16sp"
                         android:textColor="#6B7280"
                         android:fontFamily="sans-serif-light" />
@@ -74,7 +74,7 @@
                     android:id="@+id/currentTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="14:30"
+                    android:text="@string/default_main_hour"
                     android:textSize="48sp"
                     android:textColor="#1F2937"
                     android:fontFamily="sans-serif-thin"
@@ -86,7 +86,7 @@
                     android:id="@+id/motivationalText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Respira e escreve"
+                    android:text=""
                     android:textSize="15sp"
                     android:textColor="#9CA3AF"
                     android:fontFamily="sans-serif-light"
@@ -124,20 +124,19 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="O que ficou do teu dia?"
+                            android:text="@string/prompt_text"
                             android:textSize="16sp"
                             android:textColor="#6B7280"
                             android:fontFamily="sans-serif-light" />
 
                         <ImageButton
                             android:id="@+id/expandButton"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:background="?attr/selectableItemBackgroundBorderless"
-                            android:src="@android:drawable/ic_menu_zoom"
-                            android:tint="#6366F1"
-                            android:visibility="gone"
-                            android:contentDescription="Expandir edição" />
+                            android:src="@drawable/expand"
+                            android:visibility="visible"
+                            android:contentDescription="@string/expand_edit" />
 
                     </LinearLayout>
 
@@ -146,8 +145,9 @@
                         android:id="@+id/entryInput"
                         android:layout_width="match_parent"
                         android:layout_height="320dp"
+                        android:autofillHints=""
                         android:gravity="top|start"
-                        android:hint="Escreve aqui..."
+                        android:hint="@string/start_writing_hint"
                         android:inputType="textMultiLine|textCapSentences"
                         android:background="@android:color/transparent"
                         android:padding="0dp"
@@ -184,7 +184,7 @@
                             android:id="@+id/wordCounter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0 palavras"
+                            android:text="@string/word_counter_zero"
                             android:textSize="13sp"
                             android:textColor="#9CA3AF" />
 
@@ -199,7 +199,7 @@
                 android:id="@+id/saveButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="Guardar"
+                android:text="@string/save_button"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textAllCaps="false"

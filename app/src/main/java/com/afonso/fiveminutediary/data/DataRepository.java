@@ -49,6 +49,9 @@ public class DataRepository {
     private ListenerRegistration entriesListener = null;
     private ListenerRegistration profileListener = null;
 
+    private final Object saveLock = new Object();
+    private boolean isSaving = false;
+
     private DataRepository(Context context) {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
@@ -111,22 +114,32 @@ public class DataRepository {
             return;
         }
 
-        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                .format(new Date());
+        synchronized (saveLock) {
+            if (isSaving) {
+                // Já há um save em andamento — ignora esta chamada
+                if (listener != null) listener.onComplete(null);
+                return;
+            }
+            isSaving = true;
+        }
+
+        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
         getEntryForDay(today, existingEntry -> {
             if (existingEntry != null) {
-                // Update existing
                 existingEntry.setText(text);
                 existingEntry.setFormatting(formatting);
                 existingEntry.setTimestamp(System.currentTimeMillis());
-                updateEntryWithRetry(existingEntry, 0, listener);
+                updateEntryWithRetry(existingEntry, 0, task -> {
+                    synchronized (saveLock) { isSaving = false; }
+                    if (listener != null) listener.onComplete(task);
+                });
             } else {
-                // Create new
-                DiaryEntry newEntry = new DiaryEntry(
-                        null, userId, System.currentTimeMillis(), text, null, formatting
-                );
-                addEntryWithRetry(newEntry, 0, listener);
+                DiaryEntry newEntry = new DiaryEntry(null, userId, System.currentTimeMillis(), text, null, formatting);
+                addEntryWithRetry(newEntry, 0, task -> {
+                    synchronized (saveLock) { isSaving = false; }
+                    if (listener != null) listener.onComplete(task);
+                });
             }
         });
     }

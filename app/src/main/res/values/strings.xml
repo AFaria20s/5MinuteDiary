@@ -1,3 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">FiveMinuteDiary</string>
+    <!-- App Name -->
+    <string name="app_name">Five Minute Diary</string>
+
+    <!-- Main Activity -->
+    <string name="prompt_text">What marked you today?</string>
+    <string name="hint_entry">Write here…</string>
+    <string name="save_button">Save</string>
+    <string name="word_counter_zero">0 words</string>
+    <string name="expand_edit">Expand</string>
+
+    <!-- Date formats -->
+    <string name="date_format_short">%1$s %2$s</string> <!-- "27 January" -->
+
+    <!-- Motivational Texts -->
+    <string-array name="motivational_texts">
+        <item>Breathe and write</item>
+        <item>Your moment of the day</item>
+        <item>5 minutes for you</item>
+        <item>Write freely</item>
+        <item>Your thoughts</item>
+        <item>A moment of calm</item>
+    </string-array>
+
+    <!-- Daily Quotes -->
+    <string-array name="daily_quotes">
+        <item>Writing is discovering what we think</item>
+        <item>Words have power</item>
+        <item>Each day is a new page</item>
+        <item>Writing heals</item>
+        <item>Thoughts come alive when written</item>
+        <item>A diary is a silent friend</item>
+    </string-array>
+
+    <!-- Toasts & Messages -->
+    <string name="try_writing_first">Try writing something first</string>
+    <string name="saved">Saved</string>
+    <string name="deleted_successfully">Deleted successfully</string>
+    <string name="entry_deleted">Entry deleted</string>
+
+    <!-- Delete Confirmation -->
+    <string name="delete_entry_title">Delete entry</string>
+    <string name="delete_entry_message">Are you sure you want to delete this entry?</string>
+    <string name="delete_today_entry_message">Are you sure you want to delete today\'s entry?</string>
+    <string name="delete_button">Delete</string>
+    <string name="cancel_button">Cancel</string>
+
+    <!-- List Activity -->
+    <string name="history_title">History</string>
+    <string name="empty_state_title">No entries yet</string>
+    <string name="empty_state_subtitle">Start writing today</string>
+
+    <!-- Profile Activity -->
+    <string name="profile_title">Profile</string>
+    <string name="greeting">Hello,</string>
+    <string name="your_name_hint">Your name</string>
+    <string name="journey_subtitle">Your writing journey</string>
+    <string name="journey_today">Today</string>
+    <string name="journey_one_day">1 day ago</string>
+    <string name="journey_days">%d days ago</string>
+    <string name="your_writing">Your writing</string>
+    <string name="entries_label">Entries</string>
+    <string name="streak_label">Streak</string>
+    <string name="settings_label">Settings</string>
+    <string name="logout_button">Logout</string>
+    <string name="delete_account_button">Delete Account</string>
+    <string name="about_label">About</string>
+    <string name="app_version">Version 1.0.0</string>
+
+    <!-- Premium Card -->
+    <string name="premium_title">Discover patterns in your writing</string>
+    <string name="premium_subtitle">Detailed analytics, charts and much more</string>
+    <string name="premium_feature_1">Detailed streak history</string>
+    <string name="premium_feature_2">Productivity charts</string>
+    <string name="premium_feature_3">Writing pattern analysis</string>
+    <string name="premium_toast">Premium feature - Coming soon!</string>
+
+    <!-- Logout -->
+    <string name="logout_title">Logout</string>
+    <string name="logout_message">Are you sure you want to logout?</string>
+    <string name="logout_confirm">Logout</string>
+
+    <!-- Delete Account -->
+    <string name="delete_account_title">Delete Account</string>
+    <string name="delete_account_message_google">This action is PERMANENT and IRREVERSIBLE.\n\n• All your entries will be deleted\n• Your profile will be erased\n• Data cannot be recovered\n\nAre you absolutely sure?</string>
+    <string name="delete_account_confirm">Yes, delete PERMANENTLY</string>
+    <string name="delete_account_password_prompt">To delete your account, confirm your password.</string>
+    <string name="delete_account_final_title">FINAL CONFIRMATION</string>
+    <string name="delete_account_final_message">Are you ABSOLUTELY SURE you want to delete your account?\n\n• All entries will be deleted\n• Your profile will be erased\n• This action is IRREVERSIBLE\n\nData cannot be recovered.</string>
+    <string name="delete_account_final_confirm">YES, DELETE EVERYTHING</string>
+    <string name="delete_account_final_cancel">No, go back</string>
+    <string name="delete_account_progress">Deleting account…</string>
+    <string name="delete_account_wait">Please wait.</string>
+    <string name="delete_account_success">Account deleted successfully</string>
+    <string name="delete_account_error_title">Error deleting account</string>
+    <string name="delete_account_error_message">Could not delete account:\n\n%s\n\nPlease try logging out and in again before deleting.</string>
+    <string name="password_incorrect_title">Incorrect password</string>
+    <string name="password_incorrect_message">The password you entered is incorrect. Please try again.</string>
+    <string name="error_getting_user">Error getting user</string>
+    <string name="password_label">Password</string>
+    <string name="warning_irreversible">Warning: This action cannot be undone!</string>
+
+    <!-- Auth Activities -->
+    <string name="welcome_back">Welcome back</string>
+    <string name="create_account">Create Account</string>
+    <string name="start_your_journey">Start your writing journey</string>
+    <string name="email_label">Email</string>
+    <string name="password_min_label">Password (min. 6 characters)</string>
+    <string name="confirm_password_label">Confirm Password</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="login_button">Login</string>
+    <string name="register_button">Create Account</string>
+    <string name="or_label">or</string>
+    <string name="continue_google">Continue with Google</string>
+    <string name="no_account">Don\'t have an account? </string>
+    <string name="sign_up_link">Sign up</string>
+    <string name="have_account">Already have an account? </string>
+    <string name="login_link">Login</string>
+    <string name="name_label">Name</string>
+    <string name="back_button">Back</string>
+
+    <!-- Validation -->
+    <string name="email_required">Email is required</string>
+    <string name="email_invalid">Invalid email</string>
+    <string name="password_required">Password is required</string>
+    <string name="password_min_length">Password must be at least 6 characters</string>
+    <string name="name_required">Name is required</string>
+    <string name="passwords_no_match">Passwords don\'t match</string>
+
+    <!-- Auth Messages -->
+    <string name="welcome">Welcome!</string>
+    <string name="verify_email_first">Please verify your email first</string>
+    <string name="account_created">Account created! Check your email.</string>
+    <string name="verification_email_error">Error sending verification email</string>
+    <string name="google_signin_failed">Google sign in failed: %s</string>
+    <string name="auth_failed">Authentication failed</string>
+    <string name="password_reset_sent">Password reset email sent to %s</string>
+    <string name="password_reset_error">Error sending email</string>
+
+    <!-- Email Verification -->
+    <string name="verify_your_email">Verify your email</string>
+    <string name="verification_email_sent">We sent a verification link to\n%s</string>
+    <string name="resend_email_button">Resend email</string>
+    <string name="already_verified_button">Already verified</string>
+    <string name="email_resent">Email resent!</string>
+    <string name="email_verified_success">Email verified successfully!</string>
+    <string name="email_not_verified">Email not yet verified. Please check your inbox.</string>
+    <string name="email_verified">Email verified!</string>
+    <string name="verification_error">Error verifying. Please try again.</string>
+    <string name="logout_text">Logout</string>
+
+    <!-- Expanded Editor -->
+    <string name="editor_title">Editor</string>
+    <string name="formatting_label">Formatting</string>
+    <string name="undo_label">Undo</string>
+    <string name="redo_label">Redo</string>
+    <string name="close_label">Close</string>
+    <string name="char_count">%d characters</string>
+    <string name="start_writing_hint">Start writing…</string>
+
+    <!-- Formatting Sections -->
+    <string name="style_section">Style</string>
+    <string name="text_section">Text</string>
+    <string name="highlight_section">Highlight</string>
+
+    <!-- Content Descriptions -->
+    <string name="close_button_desc">Close</string>
+    <string name="undo_button_desc">Undo</string>
+    <string name="redo_button_desc">Redo</string>
+    <string name="expand_button_desc">Expand editing</string>
+    <string name="formatting_button_desc">Formatting</string>
+    <string name="bold_desc">Bold</string>
+    <string name="italic_desc">Italic</string>
+    <string name="underline_desc">Underline</string>
+    <string name="red_text_desc">Red</string>
+    <string name="blue_text_desc">Blue</string>
+    <string name="green_text_desc">Green</string>
+    <string name="yellow_highlight_desc">Yellow</string>
+    <string name="green_highlight_desc">Green</string>
+    <string name="pink_highlight_desc">Pink</string>
+    <string name="blue_highlight_desc">Blue</string>
+    <string name="delete_desc">Delete</string>
+    <string name="back_desc">Back</string>
+    <string name="change_image_desc">Change image</string>
+
+    <!-- Detail Activity -->
+    <string name="detail_date_format">EEEE, d \'of\' MMMM \'of\' yyyy</string>
+    <string name="diary_image_desc">Diary image</string>
+    <string name="image_background_title">Background image</string>
+    <string name="choose_new_image">Choose new image</string>
+    <string name="default_color">Default color</string>
+    <string name="choose_image">Choose image</string>
+    <string name="image_updated">Image updated</string>
+    <string name="image_load_error">Error loading image</string>
+
+    <!-- Toast Messages -->
+    <string name="toast_message_default">Toast message</string>
+
+    <!-- Streak Messages -->
+    <string name="streak_started">You started your journey!</string>
+    <string name="streak_2_days">2 consecutive days!</string>
+    <string name="streak_3_days">3 days! The habit is forming</string>
+    <string name="streak_week">A whole week! Amazing!</string>
+    <string name="streak_2_weeks">2 weeks! Keep it up!</string>
+    <string name="streak_month">A full month! Inspiring!</string>
+    <string name="streak_100_days">100 days! Legendary!</string>
+    <string name="streak_milestone">%d days! Extraordinary!</string>
+    <string name="streak_continue">%d days in a row</string>
+
+    <!-- List Item -->
+    <string name="month_year_format">%1$s %2$d</string> <!-- "January 2025" -->
+    <string name="preview_text_default">Preview text…</string>
+    <string name="words_meta">%d words</string>
+    <string name="entry_content_default">Diary content…</string>
+    <string name="default_main_date">27 September</string>
+    <string name="default_main_day">Monday</string>
+    <string name="default_main_hour">14:30</string>
 </resources>
