@@ -1,5 +1,6 @@
 package com.afonso.fiveminutediary.viewmodel;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -7,17 +8,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import com.afonso.fiveminutediary.R;
 import com.afonso.fiveminutediary.data.DataRepository;
 import com.afonso.fiveminutediary.data.UserProfile;
+import com.afonso.fiveminutediary.util.LocaleManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -31,7 +34,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.concurrent.TimeUnit;
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends BaseActivity {
 
     private DataRepository repo;
     private UserProfile userProfile;
@@ -42,7 +45,9 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView journeyDaysText;
     private TextView totalEntriesText;
     private TextView streakText;
+    private TextView currentLanguageText;
     private CardView premiumStatsCard;
+    private CardView languageCard;
     private Button logoutButton;
     private Button deleteAccountButton;
 
@@ -69,6 +74,7 @@ public class ProfileActivity extends AppCompatActivity {
         loadOrCreateProfile();
         setupBottomNavigation();
         setupPremiumCard();
+        setupLanguageSelector();
     }
 
     @Override
@@ -80,6 +86,9 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Reload stats
         loadProfileData();
+
+        // Update language display
+        updateLanguageDisplay();
 
         if (userProfile != null) {
             userProfile.setLastOpenedTimestamp(System.currentTimeMillis());
@@ -106,9 +115,6 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Check if user is authenticated
-     */
     private void checkAuthentication() {
         auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() == null) {
@@ -124,7 +130,9 @@ public class ProfileActivity extends AppCompatActivity {
         journeyDaysText = findViewById(R.id.journeyDaysText);
         totalEntriesText = findViewById(R.id.totalEntriesText);
         streakText = findViewById(R.id.streakText);
+        currentLanguageText = findViewById(R.id.currentLanguageText);
         premiumStatsCard = findViewById(R.id.premiumStatsCard);
+        languageCard = findViewById(R.id.languageCard);
         logoutButton = findViewById(R.id.logoutButton);
         deleteAccountButton = findViewById(R.id.deleteAccountButton);
 
@@ -138,15 +146,11 @@ public class ProfileActivity extends AppCompatActivity {
         deleteAccountButton.setOnClickListener(v -> showDeleteAccountDialog());
     }
 
-    /**
-     * Start realtime updates for profile
-     */
     private void startRealtimeProfileUpdates() {
         repo.startProfileListener(profile -> {
             runOnUiThread(() -> {
                 userProfile = profile;
                 if (userProfile != null && userProfile.getUserName() != null) {
-                    // Only update if field is not focused
                     if (!nameInput.hasFocus()) {
                         nameInput.setText(userProfile.getUserName());
                     }
@@ -170,26 +174,22 @@ public class ProfileActivity extends AppCompatActivity {
     private void loadProfileData() {
         if (userProfile == null) return;
 
-        // Journey days
         long daysSinceFirstUse = TimeUnit.MILLISECONDS.toDays(
                 System.currentTimeMillis() - userProfile.getFirstUseTimestamp()
         );
 
-        // Use proper plurals
         journeyDaysText.setText(getResources().getQuantityString(
                 R.plurals.journey_days,
                 (int) daysSinceFirstUse,
                 (int) daysSinceFirstUse
         ));
 
-        // Total entries (with cache)
         repo.getEntryCount(count -> {
             runOnUiThread(() -> {
                 totalEntriesText.setText(String.valueOf(count));
             });
         });
 
-        // Streak (with cache)
         repo.calculateStreak(streak -> {
             runOnUiThread(() -> {
                 streakText.setText(String.valueOf(streak));
@@ -201,11 +201,7 @@ public class ProfileActivity extends AppCompatActivity {
         String name = nameInput.getText().toString().trim();
         if (userProfile != null && !name.equals(userProfile.getUserName())) {
             userProfile.setUserName(name);
-
-            // Update only the "userName" field for efficiency
-            repo.updateUserProfileField("userName", name, task -> {
-                // Optional: show feedback
-            });
+            repo.updateUserProfileField("userName", name, task -> {});
         }
     }
 
@@ -215,9 +211,80 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Show logout confirmation dialog
-     */
+    // ==================== LANGUAGE SELECTOR ====================
+
+    private void setupLanguageSelector() {
+        languageCard.setOnClickListener(v -> showLanguageDialog());
+        updateLanguageDisplay();
+    }
+
+    private void updateLanguageDisplay() {
+        String currentLang = LocaleManager.getCurrentLanguageName(this);
+        currentLanguageText.setText(currentLang);
+    }
+
+    private void showLanguageDialog() {
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_language_selector, null);
+        RadioGroup radioGroup = dialogView.findViewById(R.id.languageRadioGroup);
+
+        String currentLanguage = LocaleManager.getLanguage(this);
+
+        // Add radio buttons for each language
+        LocaleManager.Language[] languages = LocaleManager.getAvailableLanguages();
+        for (LocaleManager.Language lang : languages) {
+            RadioButton radioButton = new RadioButton(this);
+            radioButton.setText(lang.nativeName + " (" + lang.name + ")");
+            radioButton.setTextSize(16);
+            radioButton.setPadding(16, 16, 16, 16);
+            radioButton.setTag(lang.code);
+
+            if (lang.code.equals(currentLanguage)) {
+                radioButton.setChecked(true);
+            }
+
+            radioGroup.addView(radioButton);
+        }
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setPositiveButton(R.string.ok, (d, which) -> {
+                    int selectedId = radioGroup.getCheckedRadioButtonId();
+                    if (selectedId != -1) {
+                        RadioButton selectedButton = dialogView.findViewById(selectedId);
+                        String selectedLang = (String) selectedButton.getTag();
+
+                        if (!selectedLang.equals(currentLanguage)) {
+                            changeLanguage(selectedLang);
+                        }
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .create();
+
+        dialog.show();
+    }
+
+    private void changeLanguage(String languageCode) {
+        // Save the language preference
+        LocaleManager.setLanguage(this, languageCode);
+
+        // Show confirmation
+        Toast.makeText(this, R.string.language_changed, Toast.LENGTH_SHORT).show();
+
+        // Recreate all activities to apply new language
+        recreateApp();
+    }
+
+    private void recreateApp() {
+        // Restart the app to apply language to all activities
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    // ==================== LOGOUT & DELETE ====================
+
     private void showLogoutDialog() {
         new AlertDialog.Builder(this)
                 .setTitle(R.string.logout_title)
@@ -228,19 +295,11 @@ public class ProfileActivity extends AppCompatActivity {
                 .show();
     }
 
-    /**
-     * Perform logout
-     */
     private void performLogout() {
-        // Clear repository cache
         repo.clearCache();
-
-        // Sign out from Firebase
         auth.signOut();
 
-        // Sign out from Google (if logged in with Google)
         googleSignInClient.signOut().addOnCompleteListener(this, task -> {
-            // Navigate to login
             Intent intent = new Intent(this, com.afonso.fiveminutediary.auth.LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
@@ -248,14 +307,10 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Show account deletion confirmation dialog
-     */
     private void showDeleteAccountDialog() {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) return;
 
-        // Check if it's a Google account or Email/Password
         boolean isGoogleAccount = false;
         for (int i = 0; i < user.getProviderData().size(); i++) {
             if (user.getProviderData().get(i).getProviderId().equals("google.com")) {
@@ -265,17 +320,12 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         if (isGoogleAccount) {
-            // For Google account, no password needed
             showDeleteConfirmationForGoogle();
         } else {
-            // For Email/Password account, ask for password
             showPasswordConfirmationDialog();
         }
     }
 
-    /**
-     * Deletion confirmation for Google accounts
-     */
     private void showDeleteConfirmationForGoogle() {
         new AlertDialog.Builder(this)
                 .setTitle(R.string.delete_account_title)
@@ -288,11 +338,7 @@ public class ProfileActivity extends AppCompatActivity {
                 .show();
     }
 
-    /**
-     * Password confirmation dialog
-     */
     private void showPasswordConfirmationDialog() {
-        // Create custom layout for dialog
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_password_confirmation, null);
         EditText passwordInput = dialogView.findViewById(R.id.passwordConfirmInput);
 
@@ -315,11 +361,8 @@ public class ProfileActivity extends AppCompatActivity {
                     return;
                 }
 
-                // Disable button during verification
                 button.setEnabled(false);
                 passwordInput.setEnabled(false);
-
-                // Re-authenticate and delete
                 reauthenticateAndDelete(password, dialog);
             });
         });
@@ -327,9 +370,6 @@ public class ProfileActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    /**
-     * Re-authenticate user and delete account
-     */
     private void reauthenticateAndDelete(String password, AlertDialog dialog) {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null || user.getEmail() == null) {
@@ -338,20 +378,16 @@ public class ProfileActivity extends AppCompatActivity {
             return;
         }
 
-        // Create credential with email and password
         AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), password);
 
-        // Re-authenticate
         user.reauthenticate(credential)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            // Password correct, show final confirmation
                             dialog.dismiss();
                             showFinalDeleteConfirmation();
                         } else {
-                            // Password incorrect
                             dialog.dismiss();
                             new AlertDialog.Builder(ProfileActivity.this)
                                     .setTitle(R.string.password_incorrect_title)
@@ -363,9 +399,6 @@ public class ProfileActivity extends AppCompatActivity {
                 });
     }
 
-    /**
-     * Final confirmation before deletion
-     */
     private void showFinalDeleteConfirmation() {
         new AlertDialog.Builder(this)
                 .setTitle(R.string.delete_account_final_title)
@@ -378,9 +411,6 @@ public class ProfileActivity extends AppCompatActivity {
                 .show();
     }
 
-    /**
-     * Perform account deletion
-     */
     private void performAccountDeletion() {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) return;
@@ -400,13 +430,9 @@ public class ProfileActivity extends AppCompatActivity {
                             loadingDialog.dismiss();
 
                             if (task.isSuccessful()) {
-                                // Clear cache
                                 repo.clearCache();
-
-                                // Sign out from Google if necessary
                                 googleSignInClient.signOut();
 
-                                // Show message and return to login
                                 Toast.makeText(ProfileActivity.this,
                                         R.string.delete_account_success,
                                         Toast.LENGTH_LONG).show();
@@ -417,7 +443,6 @@ public class ProfileActivity extends AppCompatActivity {
                                 startActivity(intent);
                                 finish();
                             } else {
-                                // Error deleting account
                                 String errorMessage = task.getException() != null ?
                                         task.getException().getMessage() : getString(R.string.unknown_error);
 

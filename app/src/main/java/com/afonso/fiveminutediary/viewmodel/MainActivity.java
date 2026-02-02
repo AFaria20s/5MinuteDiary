@@ -18,7 +18,6 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import com.afonso.fiveminutediary.R;
@@ -30,11 +29,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private static final int REQUEST_EXPANDED_EDIT = 100;
     private static final long AUTO_SAVE_DELAY = 2000; // 2 seconds
@@ -66,9 +66,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Default locale = English
-        Locale.setDefault(Locale.ENGLISH);
 
         // Check authentication
         if (!checkAuthentication()) {
@@ -149,14 +146,21 @@ public class MainActivity extends AppCompatActivity {
         todayCard = findViewById(R.id.todayCard);
         expandButton = findViewById(R.id.expandButton);
 
-        // Use English locale for date formatting
-        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.ENGLISH);
-        SimpleDateFormat dayOfMonthFormat = new SimpleDateFormat("d", Locale.ENGLISH);
-        SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM", Locale.ENGLISH);
-
+        // Use string resources for day and month names
+        Calendar cal = Calendar.getInstance();
         Date now = new Date();
-        dayOfWeek.setText(capitalize(dayFormat.format(now)));
-        dateText.setText(dayOfMonthFormat.format(now) + " " + capitalize(monthFormat.format(now)));
+        cal.setTime(now);
+
+        // Get day of week from string array
+        String[] dayNames = getResources().getStringArray(R.array.day_names);
+        int dayOfWeekIndex = cal.get(Calendar.DAY_OF_WEEK) - 1; // Sunday = 0
+        dayOfWeek.setText(capitalize(dayNames[dayOfWeekIndex]));
+
+        // Get month from string array
+        String[] monthNames = getResources().getStringArray(R.array.month_names);
+        int monthIndex = cal.get(Calendar.MONTH);
+        int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+        dateText.setText(dayOfMonth + " " + capitalize(monthNames[monthIndex]));
 
         entryInput.addTextChangedListener(new TextWatcher() {
             @Override
@@ -216,7 +220,8 @@ public class MainActivity extends AppCompatActivity {
         timeRunnable = new Runnable() {
             @Override
             public void run() {
-                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
+                // Use 24-hour format (HH:mm) which is language-independent
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
                 currentTime.setText(timeFormat.format(new Date()));
                 timeHandler.postDelayed(this, 1000);
             }
@@ -244,7 +249,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadTodayEntry() {
-        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+        // Use Locale.getDefault() for date format (language-independent format)
+        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                 .format(new Date());
 
         repo.getEntryForDay(today, entry -> {

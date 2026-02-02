@@ -13,6 +13,49 @@
     <!-- Date formats -->
     <string name="date_format_short">%1$s %2$s</string>
 
+    <!-- Month Names (full) -->
+    <string-array name="month_names">
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
+
+    <!-- Month Names (short) -->
+    <string-array name="month_names_short">
+        <item>Jan</item>
+        <item>Feb</item>
+        <item>Mar</item>
+        <item>Apr</item>
+        <item>May</item>
+        <item>Jun</item>
+        <item>Jul</item>
+        <item>Aug</item>
+        <item>Sep</item>
+        <item>Oct</item>
+        <item>Nov</item>
+        <item>Dec</item>
+    </string-array>
+
+    <!-- Day Names (full) -->
+    <string-array name="day_names">
+        <item>Sunday</item>
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+    </string-array>
+
     <!-- Motivational Texts -->
     <string-array name="motivational_texts">
         <item>Breathe and write</item>
@@ -294,4 +337,9 @@
     <string name="delete_entry_confirmation_title">Delete entry</string>
     <string name="delete_entry_confirmation_message">Are you sure you want to delete this entry?</string>
     <string name="entry_deleted_success">Entry deleted</string>
+
+    <!-- Language Settings -->
+    <string name="language_label">Language</string>
+    <string name="select_language">Select Language</string>
+    <string name="language_changed">Language changed successfully</string>
 </resources>

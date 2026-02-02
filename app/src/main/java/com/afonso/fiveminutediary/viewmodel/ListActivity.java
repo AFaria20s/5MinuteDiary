@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,7 +14,7 @@ import com.afonso.fiveminutediary.data.DataRepository;
 import com.afonso.fiveminutediary.data.DiaryEntry;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class ListActivity extends AppCompatActivity implements DiaryAdapter.OnEntryClickListener {
+public class ListActivity extends BaseActivity implements DiaryAdapter.OnEntryClickListener {
 
     private RecyclerView recyclerView;
     private DiaryAdapter adapter;

@@ -51,10 +51,17 @@ public class DiaryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         // Group entries by month/year
         String currentMonthYear = "";
-        SimpleDateFormat monthYearFormat = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
 
         for (DiaryEntry entry : entries) {
-            String entryMonthYear = monthYearFormat.format(new Date(entry.getTimestamp()));
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(entry.getTimestamp());
+
+            int month = cal.get(Calendar.MONTH);
+            int year = cal.get(Calendar.YEAR);
+
+            // Create month/year string using string resources
+            String[] monthNames = context.getResources().getStringArray(R.array.month_names);
+            String entryMonthYear = monthNames[month] + " " + year;
 
             if (!entryMonthYear.equals(currentMonthYear)) {
                 // Add month header
@@ -142,9 +149,9 @@ public class DiaryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             // Day number
             dayNumber.setText(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
 
-            // Month short (Jan, Fev, etc)
-            SimpleDateFormat monthFormat = new SimpleDateFormat("MMM", Locale.getDefault());
-            monthShort.setText(monthFormat.format(new Date(entry.getTimestamp())));
+            // Month short using string resources
+            String[] monthShortNames = context.getResources().getStringArray(R.array.month_names_short);
+            monthShort.setText(monthShortNames[cal.get(Calendar.MONTH)]);
 
             // Preview text (first 80 characters)
             String preview = entry.getText();
@@ -153,9 +160,9 @@ public class DiaryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             }
             previewText.setText(preview);
 
-            // Word count
+            // Word count using plurals
             int words = entry.getText().trim().split("\\s+").length;
-            metaText.setText(words + (words == 1 ? " palavra" : " palavras"));
+            metaText.setText(context.getResources().getQuantityString(R.plurals.word_count, words, words));
 
             // Click listeners
             itemView.setOnClickListener(v -> listener.onEntryClick(entry));
@@ -164,13 +171,13 @@ public class DiaryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         private void showDeleteConfirmation(DiaryEntry entry) {
             new AlertDialog.Builder(context)
-                    .setTitle("Eliminar entrada")
-                    .setMessage("Tens a certeza?")
-                    .setPositiveButton("Eliminar", (dialog, which) -> {
+                    .setTitle(R.string.delete_entry_confirmation_title)
+                    .setMessage(R.string.delete_entry_confirmation_message)
+                    .setPositiveButton(R.string.delete_button, (dialog, which) -> {
                         listener.onDeleteClick(entry);
-                        Toast.makeText(context, "Entrada eliminada", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, R.string.entry_deleted_toast, Toast.LENGTH_SHORT).show();
                     })
-                    .setNegativeButton("Cancelar", null)
+                    .setNegativeButton(R.string.cancel_button, null)
                     .show();
         }
     }

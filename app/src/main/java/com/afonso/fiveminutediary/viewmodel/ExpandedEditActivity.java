@@ -22,7 +22,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import com.afonso.fiveminutediary.R;
@@ -34,7 +33,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Stack;
 
-public class ExpandedEditActivity extends AppCompatActivity {
+public class ExpandedEditActivity extends BaseActivity {
 
     private static final String TAG = "ExpandedEditActivity";
     private static final long AUTO_SAVE_DELAY = 2000;
@@ -333,28 +332,23 @@ public class ExpandedEditActivity extends AppCompatActivity {
     private void toggleBold() {
         isBoldActive = !isBoldActive;
         updateButtonStates();
-        showToast(isBoldActive ? "Negrito ativado" : "Negrito desativado");
     }
 
     private void toggleItalic() {
         isItalicActive = !isItalicActive;
         updateButtonStates();
-        showToast(isItalicActive ? "Itálico ativado" : "Itálico desativado");
     }
 
     private void toggleUnderline() {
         isUnderlineActive = !isUnderlineActive;
         updateButtonStates();
-        showToast(isUnderlineActive ? "Sublinhado ativado" : "Sublinhado desativado");
     }
 
     private void toggleHighlight(int color) {
         if (activeHighlightColor != null && activeHighlightColor == color) {
             activeHighlightColor = null;
-            showToast("Realce desativado");
         } else {
             activeHighlightColor = color;
-            showToast("Realce ativado");
         }
         updateButtonStates();
     }
@@ -362,10 +356,8 @@ public class ExpandedEditActivity extends AppCompatActivity {
     private void toggleTextColor(int color) {
         if (activeTextColor != null && activeTextColor == color) {
             activeTextColor = null;
-            showToast("Cor desativada");
         } else {
             activeTextColor = color;
-            showToast("Cor ativada");
         }
         updateButtonStates();
     }
@@ -532,7 +524,7 @@ public class ExpandedEditActivity extends AppCompatActivity {
 
     private void updateCharCount() {
         int count = expandedInput.getText() != null ? expandedInput.getText().length() : 0;
-        charCountText.setText(count + " caracteres");
+        charCountText.setText(getString(R.string.char_count, count));
     }
 
     private void showToast(String message) {

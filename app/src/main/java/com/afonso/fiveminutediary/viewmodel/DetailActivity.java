@@ -14,7 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.afonso.fiveminutediary.R;
 import com.afonso.fiveminutediary.data.DataRepository;
@@ -27,7 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends BaseActivity {
 
     private static final int PICK_IMAGE_REQUEST = 1;
 
@@ -72,8 +71,8 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void loadData() {
-        // Use English locale for date formatting
-        SimpleDateFormat sdf = new SimpleDateFormat(getString(R.string.detail_date_format), Locale.ENGLISH);
+        // Use current locale for date formatting
+        SimpleDateFormat sdf = new SimpleDateFormat(getString(R.string.detail_date_format), Locale.getDefault());
         detailDate.setText(sdf.format(new Date(entry.getTimestamp())));
 
         // Count words
