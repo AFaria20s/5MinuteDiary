@@ -6,6 +6,12 @@ A minimalist journaling Android application that encourages daily reflection thr
 
 Five Minute Diary is designed around the philosophy that consistent, brief daily journaling is more valuable than sporadic long entries. The app provides a focused writing environment with advanced formatting tools while maintaining simplicity in its core user experience.
 
+## Download and Install
+- Download the `5MinuteDiary.apk` release from the latest release: [Download](https://github.com/AFaria20s/5MinuteDiary/releases/tag/1.1-RELEASE)
+- Then you just install the `.apk` and it should be good to go!
+
+Any error that you may encounter, please reach out to me by creating an Issue in this repository.
+
 ## Features
 
 ### Core Functionality
